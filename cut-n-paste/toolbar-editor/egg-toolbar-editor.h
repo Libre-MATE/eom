@@ -27,34 +27,38 @@ G_BEGIN_DECLS
 
 typedef struct EggToolbarEditorClass EggToolbarEditorClass;
 
-#define EGG_TYPE_TOOLBAR_EDITOR             (egg_toolbar_editor_get_type ())
-#define EGG_TOOLBAR_EDITOR(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), EGG_TYPE_TOOLBAR_EDITOR, EggToolbarEditor))
-#define EGG_TOOLBAR_EDITOR_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), EGG_TYPE_TOOLBAR_EDITOR, EggToolbarEditorClass))
-#define EGG_IS_TOOLBAR_EDITOR(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), EGG_TYPE_TOOLBAR_EDITOR))
-#define EGG_IS_TOOLBAR_EDITOR_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), EGG_TYPE_TOOLBAR_EDITOR))
-#define EGG_TOOLBAR_EDITOR_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), EGG_TYPE_TOOLBAR_EDITOR, EggToolbarEditorClass))
+#define EGG_TYPE_TOOLBAR_EDITOR (egg_toolbar_editor_get_type())
+#define EGG_TOOLBAR_EDITOR(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj), EGG_TYPE_TOOLBAR_EDITOR, EggToolbarEditor))
+#define EGG_TOOLBAR_EDITOR_CLASS(klass)                      \
+  (G_TYPE_CHECK_CLASS_CAST((klass), EGG_TYPE_TOOLBAR_EDITOR, \
+                           EggToolbarEditorClass))
+#define EGG_IS_TOOLBAR_EDITOR(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE((obj), EGG_TYPE_TOOLBAR_EDITOR))
+#define EGG_IS_TOOLBAR_EDITOR_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE((klass), EGG_TYPE_TOOLBAR_EDITOR))
+#define EGG_TOOLBAR_EDITOR_GET_CLASS(obj)                    \
+  (G_TYPE_INSTANCE_GET_CLASS((obj), EGG_TYPE_TOOLBAR_EDITOR, \
+                             EggToolbarEditorClass))
 
 typedef struct EggToolbarEditor EggToolbarEditor;
 typedef struct EggToolbarEditorPrivate EggToolbarEditorPrivate;
 
-struct EggToolbarEditor
-{
+struct EggToolbarEditor {
   GtkVBox parent_object;
 
   /*< private >*/
   EggToolbarEditorPrivate *priv;
 };
 
-struct EggToolbarEditorClass
-{
+struct EggToolbarEditorClass {
   GtkVBoxClass parent_class;
 };
 
-GType             egg_toolbar_editor_get_type     (void);
-GtkWidget        *egg_toolbar_editor_new          (GtkUIManager *manager,
-						   EggToolbarsModel *model);
-void		  egg_toolbar_editor_set_model	  (EggToolbarEditor *t,
-						   EggToolbarsModel *model);
+GType egg_toolbar_editor_get_type(void);
+GtkWidget *egg_toolbar_editor_new(GtkUIManager *manager,
+                                  EggToolbarsModel *model);
+void egg_toolbar_editor_set_model(EggToolbarEditor *t, EggToolbarsModel *model);
 
 G_END_DECLS
 

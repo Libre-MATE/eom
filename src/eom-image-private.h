@@ -30,30 +30,30 @@
 G_BEGIN_DECLS
 
 struct _EomImagePrivate {
-	GFile            *file;
+  GFile *file;
 
-	EomImageStatus    status;
-	EomImageStatus    prev_status;
-	EomImageMetadataStatus metadata_status;
+  EomImageStatus status;
+  EomImageStatus prev_status;
+  EomImageMetadataStatus metadata_status;
 
-	gboolean          is_playing;
-	GdkPixbufAnimation     *anim;
-	GdkPixbufAnimationIter *anim_iter;
-	GdkPixbuf        *image;
-	GdkPixbuf        *thumbnail;
+  gboolean is_playing;
+  GdkPixbufAnimation *anim;
+  GdkPixbufAnimationIter *anim_iter;
+  GdkPixbuf *image;
+  GdkPixbuf *thumbnail;
 #ifdef HAVE_RSVG
-	RsvgHandle       *svg;
+  RsvgHandle *svg;
 #endif
 
-	gint              width;
-	gint              height;
+  gint width;
+  gint height;
 
-	goffset           bytes;
-	gchar            *file_type;
+  goffset bytes;
+  gchar *file_type;
 
-	/* Holds EXIF raw data */
-	guint             exif_chunk_len;
-	guchar           *exif_chunk;
+  /* Holds EXIF raw data */
+  guint exif_chunk_len;
+  guchar *exif_chunk;
 
 #if 0
 	/* Holds IPTC raw data */
@@ -61,35 +61,35 @@ struct _EomImagePrivate {
 	guint             iptc_chunk_len;
 #endif
 
-	gboolean          modified;
-	gboolean          file_is_changed;
+  gboolean modified;
+  gboolean file_is_changed;
 
-	gboolean          autorotate;
-	gint              orientation;
+  gboolean autorotate;
+  gint orientation;
 #ifdef HAVE_EXIF
-	ExifData         *exif;
+  ExifData *exif;
 #endif
 #ifdef HAVE_EXEMPI
- 	XmpPtr   xmp;
+  XmpPtr xmp;
 #endif
 
 #if defined(HAVE_LCMS) && defined(GDK_WINDOWING_X11)
-	cmsHPROFILE       profile;
+  cmsHPROFILE profile;
 #endif
 
-	gchar            *caption;
+  gchar *caption;
 
-	gchar            *collate_key;
+  gchar *collate_key;
 
-	GMutex           status_mutex;
+  GMutex status_mutex;
 
-	gboolean          cancel_loading;
-	guint             data_ref_count;
+  gboolean cancel_loading;
+  guint data_ref_count;
 
-	GSList           *undo_stack;
+  GSList *undo_stack;
 
-	EomTransform     *trans;
-	EomTransform     *trans_autorotate;
+  EomTransform *trans;
+  EomTransform *trans_autorotate;
 };
 
 G_END_DECLS

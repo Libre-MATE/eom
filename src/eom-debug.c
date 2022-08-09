@@ -42,118 +42,99 @@ static gdouble last = 0.0;
 
 static EomDebug debug = EOM_DEBUG_NO_DEBUG;
 
-void
-eom_debug_init (void)
-{
-	if (g_getenv ("EOM_DEBUG") != NULL)
-	{
-		/* Enable all debugging */
-		debug = ~EOM_DEBUG_NO_DEBUG;
-		goto out;
-	}
+void eom_debug_init(void) {
+  if (g_getenv("EOM_DEBUG") != NULL) {
+    /* Enable all debugging */
+    debug = ~EOM_DEBUG_NO_DEBUG;
+    goto out;
+  }
 
-	if (g_getenv ("EOM_DEBUG_WINDOW") != NULL)
-		debug = debug | EOM_DEBUG_WINDOW;
+  if (g_getenv("EOM_DEBUG_WINDOW") != NULL) debug = debug | EOM_DEBUG_WINDOW;
 
-	if (g_getenv ("EOM_DEBUG_VIEW") != NULL)
-		debug = debug | EOM_DEBUG_VIEW;
+  if (g_getenv("EOM_DEBUG_VIEW") != NULL) debug = debug | EOM_DEBUG_VIEW;
 
-	if (g_getenv ("EOM_DEBUG_JOBS") != NULL)
-		debug = debug | EOM_DEBUG_JOBS;
+  if (g_getenv("EOM_DEBUG_JOBS") != NULL) debug = debug | EOM_DEBUG_JOBS;
 
-	if (g_getenv ("EOM_DEBUG_THUMBNAIL") != NULL)
-		debug = debug | EOM_DEBUG_THUMBNAIL;
+  if (g_getenv("EOM_DEBUG_THUMBNAIL") != NULL)
+    debug = debug | EOM_DEBUG_THUMBNAIL;
 
-	if (g_getenv ("EOM_DEBUG_IMAGE_DATA") != NULL)
-		debug = debug | EOM_DEBUG_IMAGE_DATA;
+  if (g_getenv("EOM_DEBUG_IMAGE_DATA") != NULL)
+    debug = debug | EOM_DEBUG_IMAGE_DATA;
 
-	if (g_getenv ("EOM_DEBUG_IMAGE_LOAD") != NULL)
-		debug = debug | EOM_DEBUG_IMAGE_LOAD;
+  if (g_getenv("EOM_DEBUG_IMAGE_LOAD") != NULL)
+    debug = debug | EOM_DEBUG_IMAGE_LOAD;
 
-	if (g_getenv ("EOM_DEBUG_IMAGE_SAVE") != NULL)
-		debug = debug | EOM_DEBUG_IMAGE_SAVE;
+  if (g_getenv("EOM_DEBUG_IMAGE_SAVE") != NULL)
+    debug = debug | EOM_DEBUG_IMAGE_SAVE;
 
-	if (g_getenv ("EOM_DEBUG_LIST_STORE") != NULL)
-		debug = debug | EOM_DEBUG_LIST_STORE;
+  if (g_getenv("EOM_DEBUG_LIST_STORE") != NULL)
+    debug = debug | EOM_DEBUG_LIST_STORE;
 
-	if (g_getenv ("EOM_DEBUG_PREFERENCES") != NULL)
-		debug = debug | EOM_DEBUG_PREFERENCES;
+  if (g_getenv("EOM_DEBUG_PREFERENCES") != NULL)
+    debug = debug | EOM_DEBUG_PREFERENCES;
 
-	if (g_getenv ("EOM_DEBUG_PRINTING") != NULL)
-		debug = debug | EOM_DEBUG_PRINTING;
+  if (g_getenv("EOM_DEBUG_PRINTING") != NULL)
+    debug = debug | EOM_DEBUG_PRINTING;
 
-	if (g_getenv ("EOM_DEBUG_LCMS") != NULL)
-		debug = debug | EOM_DEBUG_LCMS;
+  if (g_getenv("EOM_DEBUG_LCMS") != NULL) debug = debug | EOM_DEBUG_LCMS;
 
-	if (g_getenv ("EOM_DEBUG_PLUGINS") != NULL)
-		debug = debug | EOM_DEBUG_PLUGINS;
+  if (g_getenv("EOM_DEBUG_PLUGINS") != NULL) debug = debug | EOM_DEBUG_PLUGINS;
 
 out:
 
 #ifdef ENABLE_PROFILING
-	if (debug != EOM_DEBUG_NO_DEBUG)
-		timer = g_timer_new ();
+  if (debug != EOM_DEBUG_NO_DEBUG) timer = g_timer_new();
 #endif
-	return;
+  return;
 }
 
-void
-eom_debug_message (EomDebug   section,
-		   const gchar      *file,
-		   gint              line,
-		   const gchar      *function,
-		   const gchar      *format, ...)
-{
-	if (G_UNLIKELY (debug & section))
-	{
+void eom_debug_message(EomDebug section, const gchar *file, gint line,
+                       const gchar *function, const gchar *format, ...) {
+  if (G_UNLIKELY(debug & section)) {
 #ifdef ENABLE_PROFILING
-		gdouble seconds;
-		g_return_if_fail (timer != NULL);
+    gdouble seconds;
+    g_return_if_fail(timer != NULL);
 #endif
 
-		va_list args;
-		gchar *msg;
+    va_list args;
+    gchar *msg;
 
-		g_return_if_fail (format != NULL);
+    g_return_if_fail(format != NULL);
 
-		va_start (args, format);
-		msg = g_strdup_vprintf (format, args);
-		va_end (args);
+    va_start(args, format);
+    msg = g_strdup_vprintf(format, args);
+    va_end(args);
 
 #ifdef ENABLE_PROFILING
-		seconds = g_timer_elapsed (timer, NULL);
-		g_print ("[%f (%f)] %s:%d (%s) %s\n",
-			 seconds, seconds - last,  file, line, function, msg);
-		last = seconds;
+    seconds = g_timer_elapsed(timer, NULL);
+    g_print("[%f (%f)] %s:%d (%s) %s\n", seconds, seconds - last, file, line,
+            function, msg);
+    last = seconds;
 #else
-		g_print ("%s:%d (%s) %s\n", file, line, function, msg);
+    g_print("%s:%d (%s) %s\n", file, line, function, msg);
 #endif
 
-		fflush (stdout);
+    fflush(stdout);
 
-		g_free (msg);
-	}
+    g_free(msg);
+  }
 }
 
-void eom_debug (EomDebug  section,
-		  const gchar       *file,
-		  gint               line,
-		  const gchar       *function)
-{
-	if (G_UNLIKELY (debug & section))
-	{
+void eom_debug(EomDebug section, const gchar *file, gint line,
+               const gchar *function) {
+  if (G_UNLIKELY(debug & section)) {
 #ifdef ENABLE_PROFILING
-		gdouble seconds;
+    gdouble seconds;
 
-		g_return_if_fail (timer != NULL);
+    g_return_if_fail(timer != NULL);
 
-		seconds = g_timer_elapsed (timer, NULL);
-		g_print ("[%f (%f)] %s:%d (%s)\n",
-			 seconds, seconds - last, file, line, function);
-		last = seconds;
+    seconds = g_timer_elapsed(timer, NULL);
+    g_print("[%f (%f)] %s:%d (%s)\n", seconds, seconds - last, file, line,
+            function);
+    last = seconds;
 #else
-		g_print ("%s:%d (%s)\n", file, line, function);
+    g_print("%s:%d (%s)\n", file, line, function);
 #endif
-		fflush (stdout);
-	}
+    fflush(stdout);
+  }
 }

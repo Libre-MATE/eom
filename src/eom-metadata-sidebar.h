@@ -31,30 +31,38 @@
 
 G_BEGIN_DECLS
 
-#define EOM_TYPE_METADATA_SIDEBAR          (eom_metadata_sidebar_get_type ())
-#define EOM_METADATA_SIDEBAR(o)            (G_TYPE_CHECK_INSTANCE_CAST ((o), EOM_TYPE_METADATA_SIDEBAR, EomMetadataSidebar))
-#define EOM_METADATA_SIDEBAR_CLASS(k)      (G_TYPE_CHECK_CLASS_CAST((k), EOM_TYPE_METADATA_SIDEBAR, EomMetadataSidebarClass))
-#define EOM_IS_METADATA_SIDEBAR(o)         (G_TYPE_CHECK_INSTANCE_TYPE ((o), EOM_TYPE_METADATA_SIDEBAR))
-#define EOM_IS_METADATA_SIDEBAR_CLASS(k)   (G_TYPE_CHECK_CLASS_TYPE ((k), EOM_TYPE_METADATA_SIDEBAR))
-#define EOM_METADATA_SIDEBAR_GET_CLASS(o)  (G_TYPE_INSTANCE_GET_CLASS ((o), EOM_TYPE_METADATA_SIDEBAR, EomMetadataSidebarClass))
+#define EOM_TYPE_METADATA_SIDEBAR (eom_metadata_sidebar_get_type())
+#define EOM_METADATA_SIDEBAR(o)                               \
+  (G_TYPE_CHECK_INSTANCE_CAST((o), EOM_TYPE_METADATA_SIDEBAR, \
+                              EomMetadataSidebar))
+#define EOM_METADATA_SIDEBAR_CLASS(k)                      \
+  (G_TYPE_CHECK_CLASS_CAST((k), EOM_TYPE_METADATA_SIDEBAR, \
+                           EomMetadataSidebarClass))
+#define EOM_IS_METADATA_SIDEBAR(o) \
+  (G_TYPE_CHECK_INSTANCE_TYPE((o), EOM_TYPE_METADATA_SIDEBAR))
+#define EOM_IS_METADATA_SIDEBAR_CLASS(k) \
+  (G_TYPE_CHECK_CLASS_TYPE((k), EOM_TYPE_METADATA_SIDEBAR))
+#define EOM_METADATA_SIDEBAR_GET_CLASS(o)                    \
+  (G_TYPE_INSTANCE_GET_CLASS((o), EOM_TYPE_METADATA_SIDEBAR, \
+                             EomMetadataSidebarClass))
 
 typedef struct _EomMetadataSidebar EomMetadataSidebar;
 typedef struct _EomMetadataSidebarClass EomMetadataSidebarClass;
 typedef struct _EomMetadataSidebarPrivate EomMetadataSidebarPrivate;
 
 struct _EomMetadataSidebar {
-	GtkScrolledWindow parent;
+  GtkScrolledWindow parent;
 
-	EomMetadataSidebarPrivate *priv;
+  EomMetadataSidebarPrivate *priv;
 };
 
 struct _EomMetadataSidebarClass {
-	GtkScrolledWindowClass parent_klass;
+  GtkScrolledWindowClass parent_klass;
 };
 
-GType eom_metadata_sidebar_get_type (void) G_GNUC_CONST;
+GType eom_metadata_sidebar_get_type(void) G_GNUC_CONST;
 
-GtkWidget* eom_metadata_sidebar_new (EomWindow *window);
+GtkWidget *eom_metadata_sidebar_new(EomWindow *window);
 
 G_END_DECLS
 

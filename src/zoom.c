@@ -19,9 +19,13 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
-#include <math.h>
+#endif
+
 #include "zoom.h"
+
+#include <math.h>
 
 /**
  * zoom_fit_size:
@@ -29,7 +33,8 @@
  * @dest_height: Height of destination area.
  * @src_width: Width of source image.
  * @src_height: Height of source image.
- * @upscale_smaller: Whether to scale up images smaller than the destination size.
+ * @upscale_smaller: Whether to scale up images smaller than the destination
+ *size.
  * @width: Return value for image width.
  * @height: Return value for image height.
  *
@@ -38,42 +43,40 @@
  * destination size will be scaled up; otherwise, they will be left at their
  * original size.
  **/
-void
-zoom_fit_size (guint dest_width, guint dest_height,
-	       guint src_width, guint src_height,
-	       gboolean upscale_smaller,
-	       guint *width, guint *height)
-{
-	guint w, h;
+void zoom_fit_size(guint dest_width, guint dest_height, guint src_width,
+                   guint src_height, gboolean upscale_smaller, guint *width,
+                   guint *height) {
+  guint w, h;
 
-	g_return_if_fail (width != NULL);
-	g_return_if_fail (height != NULL);
+  g_return_if_fail(width != NULL);
+  g_return_if_fail(height != NULL);
 
-	if (src_width == 0 || src_height == 0) {
-		*width = 0;
-		*height = 0;
-		return;
-	}
+  if (src_width == 0 || src_height == 0) {
+    *width = 0;
+    *height = 0;
+    return;
+  }
 
-	if (src_width <= dest_width && src_height <= dest_height && !upscale_smaller) {
-		*width = src_width;
-		*height = src_height;
-		return;
-	}
+  if (src_width <= dest_width && src_height <= dest_height &&
+      !upscale_smaller) {
+    *width = src_width;
+    *height = src_height;
+    return;
+  }
 
-	w = dest_width;
-	h = floor ((double) (src_height * w) / src_width + 0.5);
+  w = dest_width;
+  h = floor((double)(src_height * w) / src_width + 0.5);
 
-	if (h > dest_height) {
-		h = dest_height;
-		w = floor ((double) (src_width * h) / src_height + 0.5);
-	}
+  if (h > dest_height) {
+    h = dest_height;
+    w = floor((double)(src_width * h) / src_height + 0.5);
+  }
 
-	g_assert (w <= dest_width);
-	g_assert (h <= dest_height);
+  g_assert(w <= dest_width);
+  g_assert(h <= dest_height);
 
-	*width = w;
-	*height = h;
+  *width = w;
+  *height = h;
 }
 
 /**
@@ -82,35 +85,31 @@ zoom_fit_size (guint dest_width, guint dest_height,
  * @dest_height: Height of destination area.
  * @src_width: Width of source image.
  * @src_height: Height of source image.
- * @upscale_smaller: Whether to scale up images smaller than the destination size.
+ * @upscale_smaller: Whether to scale up images smaller than the destination
+ *size.
  *
  * Similar to zoom_fit_size(), but returns the zoom factor of the final image
  * with respect to the original image's size.
  *
  * Return value: Zoom factor with respect to the original size.
  **/
-double
-zoom_fit_scale (guint dest_width, guint dest_height,
-		guint src_width, guint src_height,
-		gboolean upscale_smaller)
-{
-	guint w, h;
-	double wfactor, hfactor;
-	double factor;
+double zoom_fit_scale(guint dest_width, guint dest_height, guint src_width,
+                      guint src_height, gboolean upscale_smaller) {
+  guint w, h;
+  double wfactor, hfactor;
+  double factor;
 
-	if (src_width == 0 || src_height == 0)
-		return 1.0;
+  if (src_width == 0 || src_height == 0) return 1.0;
 
-	if (dest_width == 0 || dest_height == 0)
-		return 0.0;
+  if (dest_width == 0 || dest_height == 0) return 0.0;
 
-	zoom_fit_size (dest_width, dest_height, src_width, src_height, upscale_smaller, &w, &h);
+  zoom_fit_size(dest_width, dest_height, src_width, src_height, upscale_smaller,
+                &w, &h);
 
-	wfactor = (double) w / src_width;
-	hfactor = (double) h / src_height;
+  wfactor = (double)w / src_width;
+  hfactor = (double)h / src_height;
 
-	factor = MIN (wfactor, hfactor);
+  factor = MIN(wfactor, hfactor);
 
-	return factor;
+  return factor;
 }
-

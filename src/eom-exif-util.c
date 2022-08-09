@@ -32,39 +32,38 @@
 #define _XOPEN_SOURCE
 #define _XOPEN_SOURCE_EXTENDED 1
 #endif
+#include <glib/gi18n.h>
+#include <string.h>
 #include <time.h>
 
 #include "eom-exif-util.h"
 #include "eom-util.h"
 
-#include <string.h>
-#include <glib/gi18n.h>
-
 #define DATE_BUF_SIZE 200
 
 /* gboolean <-> gpointer conversion macros taken from gedit */
 #ifndef GBOOLEAN_TO_POINTER
-#define GBOOLEAN_TO_POINTER(i) (GINT_TO_POINTER ((i) ? 2 : 1))
+#define GBOOLEAN_TO_POINTER(i) (GINT_TO_POINTER((i) ? 2 : 1))
 #endif
 #ifndef GPOINTER_TO_BOOLEAN
-#define GPOINTER_TO_BOOLEAN(i) ((gboolean) ((GPOINTER_TO_INT (i) == 2) ? TRUE : FALSE))
+#define GPOINTER_TO_BOOLEAN(i) \
+  ((gboolean)((GPOINTER_TO_INT(i) == 2) ? TRUE : FALSE))
 #endif
 
 typedef ExifData EomExifData;
 
 /* Define EomExifData type */
-G_DEFINE_BOXED_TYPE(EomExifData, eom_exif_data, eom_exif_data_copy, eom_exif_data_free)
+G_DEFINE_BOXED_TYPE(EomExifData, eom_exif_data, eom_exif_data_copy,
+                    eom_exif_data_free)
 
 #ifdef HAVE_STRPTIME
-static gpointer
-_check_strptime_updates_wday (gpointer data)
-{
-	struct tm tm;
+static gpointer _check_strptime_updates_wday(gpointer data) {
+  struct tm tm;
 
-	memset (&tm, '\0', sizeof (tm));
-	strptime ("2008:12:24 20:30:45", "%Y:%m:%d %T", &tm);
-	/* Check if tm.tm_wday is set to Wednesday (3) now */
-	return GBOOLEAN_TO_POINTER (tm.tm_wday == 3);
+  memset(&tm, '\0', sizeof(tm));
+  strptime("2008:12:24 20:30:45", "%Y:%m:%d %T", &tm);
+  /* Check if tm.tm_wday is set to Wednesday (3) now */
+  return GBOOLEAN_TO_POINTER(tm.tm_wday == 3);
 }
 #endif
 
@@ -75,24 +74,20 @@ _check_strptime_updates_wday (gpointer data)
  * Ensure tm_wday and tm_yday are set correctly in a struct tm.
  * The other date (dmy) values must have been set already.
  **/
-static void
-_calculate_wday_yday (struct tm *tm)
-{
-	GDate *exif_date;
-	struct tm tmp_tm;
+static void _calculate_wday_yday(struct tm *tm) {
+  GDate *exif_date;
+  struct tm tmp_tm;
 
-	exif_date = g_date_new_dmy (tm->tm_mday,
-				    tm->tm_mon+1,
-				    tm->tm_year+1900);
+  exif_date = g_date_new_dmy(tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900);
 
-	g_return_if_fail (exif_date != NULL && g_date_valid (exif_date));
+  g_return_if_fail(exif_date != NULL && g_date_valid(exif_date));
 
-	// Use this to get GLib <-> libc corrected values
-	g_date_to_struct_tm (exif_date, &tmp_tm);
-	g_date_free (exif_date);
+  // Use this to get GLib <-> libc corrected values
+  g_date_to_struct_tm(exif_date, &tmp_tm);
+  g_date_free(exif_date);
 
-	tm->tm_wday = tmp_tm.tm_wday;
-	tm->tm_yday = tmp_tm.tm_yday;
+  tm->tm_wday = tmp_tm.tm_wday;
+  tm->tm_yday = tmp_tm.tm_yday;
 }
 
 /* Older GCCs don't support pragma diagnostic inside functions.
@@ -102,71 +97,67 @@ _calculate_wday_yday (struct tm *tm)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
 #ifdef HAVE_STRPTIME
-static gchar *
-eom_exif_util_format_date_with_strptime (const gchar *date, const gchar* format)
-{
-	static GOnce strptime_updates_wday = G_ONCE_INIT;
-	gchar *new_date = NULL;
-	gchar tmp_date[DATE_BUF_SIZE];
-	gchar *p;
-	gsize dlen;
-	struct tm tm;
+static gchar *eom_exif_util_format_date_with_strptime(const gchar *date,
+                                                      const gchar *format) {
+  static GOnce strptime_updates_wday = G_ONCE_INIT;
+  gchar *new_date = NULL;
+  gchar tmp_date[DATE_BUF_SIZE];
+  gchar *p;
+  gsize dlen;
+  struct tm tm;
 
-	memset (&tm, '\0', sizeof (tm));
-	p = strptime (date, "%Y:%m:%d %T", &tm);
+  memset(&tm, '\0', sizeof(tm));
+  p = strptime(date, "%Y:%m:%d %T", &tm);
 
-	if (p == date + strlen (date)) {
-		g_once (&strptime_updates_wday,
-			_check_strptime_updates_wday,
-			NULL);
+  if (p == date + strlen(date)) {
+    g_once(&strptime_updates_wday, _check_strptime_updates_wday, NULL);
 
-		// Ensure tm.tm_wday and tm.tm_yday are set
-		if (!GPOINTER_TO_BOOLEAN (strptime_updates_wday.retval))
-			_calculate_wday_yday (&tm);
+    // Ensure tm.tm_wday and tm.tm_yday are set
+    if (!GPOINTER_TO_BOOLEAN(strptime_updates_wday.retval))
+      _calculate_wday_yday(&tm);
 
-		/* A strftime-formatted string, to display the date the image was taken.  */
-		dlen = strftime (tmp_date, DATE_BUF_SIZE * sizeof(gchar), format, &tm);
-		new_date = g_strndup (tmp_date, dlen);
-	}
+    /* A strftime-formatted string, to display the date the image was taken.  */
+    dlen = strftime(tmp_date, DATE_BUF_SIZE * sizeof(gchar), format, &tm);
+    new_date = g_strndup(tmp_date, dlen);
+  }
 
-	return new_date;
+  return new_date;
 }
 #else
-static gchar *
-eom_exif_util_format_date_by_hand (const gchar *date, const gchar* format)
-{
-	int year, month, day, hour, minutes, seconds;
-	int result;
-	gchar *new_date = NULL;
+static gchar *eom_exif_util_format_date_by_hand(const gchar *date,
+                                                const gchar *format) {
+  int year, month, day, hour, minutes, seconds;
+  int result;
+  gchar *new_date = NULL;
 
-	result = sscanf (date, "%d:%d:%d %d:%d:%d",
-			 &year, &month, &day, &hour, &minutes, &seconds);
+  result = sscanf(date, "%d:%d:%d %d:%d:%d", &year, &month, &day, &hour,
+                  &minutes, &seconds);
 
-	if (result < 3 || !g_date_valid_dmy (day, month, year)) {
-		return NULL;
-	} else {
-		gchar tmp_date[DATE_BUF_SIZE];
-		gsize dlen;
-		struct tm tm;
+  if (result < 3 || !g_date_valid_dmy(day, month, year)) {
+    return NULL;
+  } else {
+    gchar tmp_date[DATE_BUF_SIZE];
+    gsize dlen;
+    struct tm tm;
 
-		memset (&tm, '\0', sizeof (tm));
-		tm.tm_mday = day;
-		tm.tm_mon = month-1;
-		tm.tm_year = year-1900;
-		// Calculate tm.tm_wday
-		_calculate_wday_yday (&tm);
+    memset(&tm, '\0', sizeof(tm));
+    tm.tm_mday = day;
+    tm.tm_mon = month - 1;
+    tm.tm_year = year - 1900;
+    // Calculate tm.tm_wday
+    _calculate_wday_yday(&tm);
 
-		tm.tm_sec = result < 6 ? 0 : seconds;
-		tm.tm_min = result < 5 ? 0 : minutes;
-		tm.tm_hour = result < 4 ? 0 : hour;
-		dlen = strftime (tmp_date, DATE_BUF_SIZE * sizeof(gchar), format, &tm);
+    tm.tm_sec = result < 6 ? 0 : seconds;
+    tm.tm_min = result < 5 ? 0 : minutes;
+    tm.tm_hour = result < 4 ? 0 : hour;
+    dlen = strftime(tmp_date, DATE_BUF_SIZE * sizeof(gchar), format, &tm);
 
-		if (dlen == 0)
-			return NULL;
-		else
-			new_date = g_strndup (tmp_date, dlen);
-	}
-	return new_date;
+    if (dlen == 0)
+      return NULL;
+    else
+      new_date = g_strndup(tmp_date, dlen);
+  }
+  return new_date;
 }
 #endif /* HAVE_STRPTIME */
 
@@ -182,134 +173,123 @@ eom_exif_util_format_date_by_hand (const gchar *date, const gchar* format)
  * Returns: a newly allocated date string formatted according to the
  * current locale.
  */
-gchar *
-eom_exif_util_format_date (const gchar *date)
-{
-	gchar *new_date;
+gchar *eom_exif_util_format_date(const gchar *date) {
+  gchar *new_date;
 #ifdef HAVE_STRPTIME
-	/* A strftime-formatted string, to display the date the image was taken.  */
-	new_date = eom_exif_util_format_date_with_strptime (date, _("%a, %d %B %Y  %X"));
+  /* A strftime-formatted string, to display the date the image was taken.  */
+  new_date =
+      eom_exif_util_format_date_with_strptime(date, _("%a, %d %B %Y  %X"));
 #else
-	new_date = eom_exif_util_format_date_by_hand (date, _("%a, %d %B %Y  %X"));
+  new_date = eom_exif_util_format_date_by_hand(date, _("%a, %d %B %Y  %X"));
 #endif /* HAVE_STRPTIME */
-	return new_date;
+  return new_date;
 }
 
-void
-eom_exif_util_set_label_text (GtkLabel *label,
-			      EomExifData *exif_data,
-			      gint tag_id)
-{
-	gchar exif_buffer[512];
-	const gchar *buf_ptr;
-	gchar *label_text = NULL;
+void eom_exif_util_set_label_text(GtkLabel *label, EomExifData *exif_data,
+                                  gint tag_id) {
+  gchar exif_buffer[512];
+  const gchar *buf_ptr;
+  gchar *label_text = NULL;
 
-	g_return_if_fail (GTK_IS_LABEL (label));
+  g_return_if_fail(GTK_IS_LABEL(label));
 
-	if (exif_data) {
-		buf_ptr = eom_exif_data_get_value (exif_data, tag_id,
-						   exif_buffer, 512);
+  if (exif_data) {
+    buf_ptr = eom_exif_data_get_value(exif_data, tag_id, exif_buffer, 512);
 
-		if (tag_id == EXIF_TAG_DATE_TIME_ORIGINAL && buf_ptr)
-			label_text = eom_exif_util_format_date (buf_ptr);
-		else
-			label_text = eom_util_make_valid_utf8 (buf_ptr);
-	}
+    if (tag_id == EXIF_TAG_DATE_TIME_ORIGINAL && buf_ptr)
+      label_text = eom_exif_util_format_date(buf_ptr);
+    else
+      label_text = eom_util_make_valid_utf8(buf_ptr);
+  }
 
-	gtk_label_set_text (label, label_text);
-	g_free (label_text);
+  gtk_label_set_text(label, label_text);
+  g_free(label_text);
 }
 
-void
-eom_exif_util_format_datetime_label (GtkLabel *label, EomExifData *exif_data,
-                                     gint tag_id, const gchar *format)
-{
-	gchar exif_buffer[512];
-	const gchar *buf_ptr;
-	gchar *label_text = NULL;
+void eom_exif_util_format_datetime_label(GtkLabel *label,
+                                         EomExifData *exif_data, gint tag_id,
+                                         const gchar *format) {
+  gchar exif_buffer[512];
+  const gchar *buf_ptr;
+  gchar *label_text = NULL;
 
-	g_return_if_fail (GTK_IS_LABEL (label));
-	g_warn_if_fail (tag_id == EXIF_TAG_DATE_TIME_ORIGINAL);
+  g_return_if_fail(GTK_IS_LABEL(label));
+  g_warn_if_fail(tag_id == EXIF_TAG_DATE_TIME_ORIGINAL);
 
-	if (exif_data) {
-	    buf_ptr = eom_exif_data_get_value (exif_data, tag_id,
-	                                       exif_buffer, 512);
+  if (exif_data) {
+    buf_ptr = eom_exif_data_get_value(exif_data, tag_id, exif_buffer, 512);
 
-	    if (tag_id == EXIF_TAG_DATE_TIME_ORIGINAL && buf_ptr)
+    if (tag_id == EXIF_TAG_DATE_TIME_ORIGINAL && buf_ptr)
 #ifdef HAVE_STRPTIME
-	        label_text = eom_exif_util_format_date_with_strptime (buf_ptr, format);
+      label_text = eom_exif_util_format_date_with_strptime(buf_ptr, format);
 #else
-	        label_text = eom_exif_util_format_date_by_hand (buf_ptr, format);
+      label_text = eom_exif_util_format_date_by_hand(buf_ptr, format);
 #endif /* HAVE_STRPTIME */
-	}
+  }
 
-	gtk_label_set_text (label, label_text);
-	g_free (label_text);
+  gtk_label_set_text(label, label_text);
+  g_free(label_text);
 }
 
-void
-eom_exif_util_set_focal_length_label_text (GtkLabel *label,
-					   EomExifData *exif_data)
-{
-	ExifEntry *entry = NULL, *entry35mm = NULL;
-	ExifByteOrder byte_order;
-	gfloat f_val = 0.0;
-	gchar *fl_text = NULL,*fl35_text = NULL;
+void eom_exif_util_set_focal_length_label_text(GtkLabel *label,
+                                               EomExifData *exif_data) {
+  ExifEntry *entry = NULL, *entry35mm = NULL;
+  ExifByteOrder byte_order;
+  gfloat f_val = 0.0;
+  gchar *fl_text = NULL, *fl35_text = NULL;
 
-	/* If no ExifData is supplied the label will be
-	 * cleared later as fl35_text is NULL. */
-	if (exif_data != NULL) {
-		entry = exif_data_get_entry (exif_data, EXIF_TAG_FOCAL_LENGTH);
-		entry35mm = exif_data_get_entry (exif_data,
-					    EXIF_TAG_FOCAL_LENGTH_IN_35MM_FILM);
-		byte_order = exif_data_get_byte_order (exif_data);
-	}
+  /* If no ExifData is supplied the label will be
+   * cleared later as fl35_text is NULL. */
+  if (exif_data != NULL) {
+    entry = exif_data_get_entry(exif_data, EXIF_TAG_FOCAL_LENGTH);
+    entry35mm =
+        exif_data_get_entry(exif_data, EXIF_TAG_FOCAL_LENGTH_IN_35MM_FILM);
+    byte_order = exif_data_get_byte_order(exif_data);
+  }
 
-	if (entry && G_LIKELY (entry->format == EXIF_FORMAT_RATIONAL)) {
-		ExifRational value;
+  if (entry && G_LIKELY(entry->format == EXIF_FORMAT_RATIONAL)) {
+    ExifRational value;
 
-		/* Decode value by hand as libexif is not necessarily returning
-		 * it in the format we want it to be.
-		 */
-		value = exif_get_rational (entry->data, byte_order);
-		/* Guard against div by zero */
-		if (G_LIKELY(value.denominator != 0))
-			f_val = (gfloat)value.numerator/
-				(gfloat)value.denominator;
+    /* Decode value by hand as libexif is not necessarily returning
+     * it in the format we want it to be.
+     */
+    value = exif_get_rational(entry->data, byte_order);
+    /* Guard against div by zero */
+    if (G_LIKELY(value.denominator != 0))
+      f_val = (gfloat)value.numerator / (gfloat)value.denominator;
 
-		/* TRANSLATORS: This is the actual focal length used when
-		   the image was taken.*/
-		fl_text = g_strdup_printf (_("%.1f (lens)"), f_val);
+    /* TRANSLATORS: This is the actual focal length used when
+       the image was taken.*/
+    fl_text = g_strdup_printf(_("%.1f (lens)"), f_val);
+  }
+  if (entry35mm && G_LIKELY(entry35mm->format == EXIF_FORMAT_SHORT)) {
+    ExifShort s_val;
 
-	}
-	if (entry35mm && G_LIKELY (entry35mm->format == EXIF_FORMAT_SHORT)) {
-		ExifShort s_val;
+    s_val = exif_get_short(entry35mm->data, byte_order);
 
-		s_val = exif_get_short (entry35mm->data, byte_order);
+    /* Print as float to get a similar look as above. */
+    /* TRANSLATORS: This is the equivalent focal length assuming
+       a 35mm film camera. */
+    fl35_text = g_strdup_printf(_("%.1f (35mm film)"), (float)s_val);
+  }
 
-		/* Print as float to get a similar look as above. */
-		/* TRANSLATORS: This is the equivalent focal length assuming
-		   a 35mm film camera. */
-		fl35_text = g_strdup_printf(_("%.1f (35mm film)"),(float)s_val);
-	}
+  if (fl_text) {
+    if (fl35_text) {
+      gchar *merged_txt;
 
-	if (fl_text) {
-		if (fl35_text) {
-			gchar *merged_txt;
+      merged_txt = g_strconcat(fl35_text, ", ", fl_text, NULL);
+      gtk_label_set_text(label, merged_txt);
+      g_free(merged_txt);
+    } else {
+      gtk_label_set_text(label, fl_text);
+    }
+  } else {
+    /* This will also clear the label if no ExifData was supplied */
+    gtk_label_set_text(label, fl35_text);
+  }
 
-			merged_txt = g_strconcat (fl35_text,", ", fl_text, NULL);
-			gtk_label_set_text (label, merged_txt);
-			g_free (merged_txt);
-		} else {
-			gtk_label_set_text (label, fl_text);
-		}
-	} else {
-		/* This will also clear the label if no ExifData was supplied */
-		gtk_label_set_text (label, fl35_text);
-	}
-
-	g_free (fl35_text);
-	g_free (fl_text);
+  g_free(fl35_text);
+  g_free(fl_text);
 }
 
 /**
@@ -326,31 +306,24 @@ eom_exif_util_set_focal_length_label_text (GtkLabel *label,
  *
  * Returns: a pointer to @buffer.
  */
-const gchar *
-eom_exif_data_get_value (EomExifData *exif_data, gint tag_id, gchar *buffer, guint buf_size)
-{
-	ExifEntry *exif_entry;
-	const gchar *exif_value;
+const gchar *eom_exif_data_get_value(EomExifData *exif_data, gint tag_id,
+                                     gchar *buffer, guint buf_size) {
+  ExifEntry *exif_entry;
+  const gchar *exif_value;
 
-        exif_entry = exif_data_get_entry (exif_data, tag_id);
+  exif_entry = exif_data_get_entry(exif_data, tag_id);
 
-	buffer[0] = 0;
+  buffer[0] = 0;
 
-	exif_value = exif_entry_get_value (exif_entry, buffer, buf_size);
+  exif_value = exif_entry_get_value(exif_entry, buffer, buf_size);
 
-	return exif_value;
+  return exif_value;
 }
 
-EomExifData *
-eom_exif_data_copy (EomExifData *data)
-{
-	exif_data_ref (data);
+EomExifData *eom_exif_data_copy(EomExifData *data) {
+  exif_data_ref(data);
 
-	return data;
+  return data;
 }
 
-void
-eom_exif_data_free (EomExifData *data)
-{
-	exif_data_unref (data);
-}
+void eom_exif_data_free(EomExifData *data) { exif_data_unref(data); }

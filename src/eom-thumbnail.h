@@ -26,21 +26,20 @@
 #define _EOM_THUMBNAIL_H_
 
 #include <gdk-pixbuf/gdk-pixbuf.h>
+
 #include "eom-image.h"
 
 G_BEGIN_DECLS
 
-void          eom_thumbnail_init        (void);
+void eom_thumbnail_init(void);
 
-GdkPixbuf*    eom_thumbnail_fit_to_size (GdkPixbuf *thumbnail,
-					 gint        dimension);
+GdkPixbuf *eom_thumbnail_fit_to_size(GdkPixbuf *thumbnail, gint dimension);
 
-GdkPixbuf*    eom_thumbnail_add_frame   (GdkPixbuf *thumbnail);
+GdkPixbuf *eom_thumbnail_add_frame(GdkPixbuf *thumbnail);
 
-GdkPixbuf*    eom_thumbnail_load        (EomImage *image,
-					 GError **error);
+GdkPixbuf *eom_thumbnail_load(EomImage *image, GError **error);
 
-#define EOM_THUMBNAIL_ORIGINAL_WIDTH  "eom-thumbnail-orig-width"
+#define EOM_THUMBNAIL_ORIGINAL_WIDTH "eom-thumbnail-orig-width"
 #define EOM_THUMBNAIL_ORIGINAL_HEIGHT "eom-thumbnail-orig-height"
 
 G_END_DECLS

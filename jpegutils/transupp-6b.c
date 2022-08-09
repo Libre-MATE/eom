@@ -17,7 +17,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ * USA.
  */
 
 /* based upon file transupp.c from the libjpeg package, original copyright
@@ -37,30 +38,32 @@
  * interfaces.
  */
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
 
 #ifdef HAVE_LIBJPEG
 
 #define SAVE_MARKERS_SUPPORTED 1
 
+#include <stddef.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <jpeglib.h>
-#include "transupp-6b.h"		/* My own external interface */
+
+#include "transupp-6b.h" /* My own external interface */
 
 #ifndef MAX
-#define MAX(a, b)  (((a) > (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
-enum {
-  JERR_CONVERSION_NOTIMPL
-};
+enum { JERR_CONVERSION_NOTIMPL };
 
-#define ERREXIT(cinfo,code)  \
+#define ERREXIT(cinfo, code)        \
   ((cinfo)->err->msg_code = (code), \
-   (*(cinfo)->err->error_exit) ((j_common_ptr) (cinfo)))
+   (*(cinfo)->err->error_exit)((j_common_ptr)(cinfo)))
 
-static long
-jround_up (long a, long b)
+static long jround_up(long a, long b)
 /* Compute a rounded up to next multiple of b, ie, ceil(a/b)*b */
 /* Assumes a >= 0, b > 0 */
 {
@@ -68,17 +71,16 @@ jround_up (long a, long b)
   return a - (a % b);
 }
 
-static void
-jcopy_block_row (JBLOCKROW input_row, JBLOCKROW output_row,
-		 JDIMENSION num_blocks)
+static void jcopy_block_row(JBLOCKROW input_row, JBLOCKROW output_row,
+                            JDIMENSION num_blocks)
 /* Copy a row of coefficient blocks from one place to another. */
 {
   register JCOEFPTR inptr, outptr;
   register long count;
 
-  inptr = (JCOEFPTR) input_row;
-  outptr = (JCOEFPTR) output_row;
-  for (count = (long) num_blocks * DCTSIZE2; count > 0; count--) {
+  inptr = (JCOEFPTR)input_row;
+  outptr = (JCOEFPTR)output_row;
+  for (count = (long)num_blocks * DCTSIZE2; count > 0; count--) {
     *outptr++ = *inptr++;
   }
 }
@@ -120,9 +122,8 @@ jcopy_block_row (JBLOCKROW input_row, JBLOCKROW output_row,
  * dimensions and ignore the source's.
  */
 
-static void
-do_flip_h (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
-	   jvirt_barray_ptr *src_coef_arrays)
+static void do_flip_h(j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
+                      jvirt_barray_ptr *src_coef_arrays)
 /* Horizontal flip; done in-place, so no separate dest array is required */
 {
   JDIMENSION MCU_cols, comp_width, blk_x, blk_y;
@@ -143,35 +144,34 @@ do_flip_h (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
     compptr = dstinfo->comp_info + ci;
     comp_width = MCU_cols * compptr->h_samp_factor;
     for (blk_y = 0; blk_y < compptr->height_in_blocks;
-	 blk_y += compptr->v_samp_factor) {
-      buffer = (*srcinfo->mem->access_virt_barray)
-	((j_common_ptr) srcinfo, src_coef_arrays[ci], blk_y,
-	 (JDIMENSION) compptr->v_samp_factor, TRUE);
+         blk_y += compptr->v_samp_factor) {
+      buffer = (*srcinfo->mem->access_virt_barray)(
+          (j_common_ptr)srcinfo, src_coef_arrays[ci], blk_y,
+          (JDIMENSION)compptr->v_samp_factor, TRUE);
       for (offset_y = 0; offset_y < compptr->v_samp_factor; offset_y++) {
-	for (blk_x = 0; blk_x * 2 < comp_width; blk_x++) {
-	  ptr1 = buffer[offset_y][blk_x];
-	  ptr2 = buffer[offset_y][comp_width - blk_x - 1];
-	  /* this unrolled loop doesn't need to know which row it's on... */
-	  for (k = 0; k < DCTSIZE2; k += 2) {
-	    temp1 = *ptr1;	/* swap even column */
-	    temp2 = *ptr2;
-	    *ptr1++ = temp2;
-	    *ptr2++ = temp1;
-	    temp1 = *ptr1;	/* swap odd column with sign change */
-	    temp2 = *ptr2;
-	    *ptr1++ = -temp2;
-	    *ptr2++ = -temp1;
-	  }
-	}
+        for (blk_x = 0; blk_x * 2 < comp_width; blk_x++) {
+          ptr1 = buffer[offset_y][blk_x];
+          ptr2 = buffer[offset_y][comp_width - blk_x - 1];
+          /* this unrolled loop doesn't need to know which row it's on... */
+          for (k = 0; k < DCTSIZE2; k += 2) {
+            temp1 = *ptr1; /* swap even column */
+            temp2 = *ptr2;
+            *ptr1++ = temp2;
+            *ptr2++ = temp1;
+            temp1 = *ptr1; /* swap odd column with sign change */
+            temp2 = *ptr2;
+            *ptr1++ = -temp2;
+            *ptr2++ = -temp1;
+          }
+        }
       }
     }
   }
 }
 
-static void
-do_flip_v (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
-	   jvirt_barray_ptr *src_coef_arrays,
-	   jvirt_barray_ptr *dst_coef_arrays)
+static void do_flip_v(j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
+                      jvirt_barray_ptr *src_coef_arrays,
+                      jvirt_barray_ptr *dst_coef_arrays)
 /* Vertical flip */
 {
   JDIMENSION MCU_rows, comp_height, dst_blk_x, dst_blk_y;
@@ -194,54 +194,51 @@ do_flip_v (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
     compptr = dstinfo->comp_info + ci;
     comp_height = MCU_rows * compptr->v_samp_factor;
     for (dst_blk_y = 0; dst_blk_y < compptr->height_in_blocks;
-	 dst_blk_y += compptr->v_samp_factor) {
-      dst_buffer = (*srcinfo->mem->access_virt_barray)
-	((j_common_ptr) srcinfo, dst_coef_arrays[ci], dst_blk_y,
-	 (JDIMENSION) compptr->v_samp_factor, TRUE);
+         dst_blk_y += compptr->v_samp_factor) {
+      dst_buffer = (*srcinfo->mem->access_virt_barray)(
+          (j_common_ptr)srcinfo, dst_coef_arrays[ci], dst_blk_y,
+          (JDIMENSION)compptr->v_samp_factor, TRUE);
       if (dst_blk_y < comp_height) {
-	/* Row is within the mirrorable area. */
-	src_buffer = (*srcinfo->mem->access_virt_barray)
-	  ((j_common_ptr) srcinfo, src_coef_arrays[ci],
-	   comp_height - dst_blk_y - (JDIMENSION) compptr->v_samp_factor,
-	   (JDIMENSION) compptr->v_samp_factor, FALSE);
+        /* Row is within the mirrorable area. */
+        src_buffer = (*srcinfo->mem->access_virt_barray)(
+            (j_common_ptr)srcinfo, src_coef_arrays[ci],
+            comp_height - dst_blk_y - (JDIMENSION)compptr->v_samp_factor,
+            (JDIMENSION)compptr->v_samp_factor, FALSE);
       } else {
-	/* Bottom-edge blocks will be copied verbatim. */
-	src_buffer = (*srcinfo->mem->access_virt_barray)
-	  ((j_common_ptr) srcinfo, src_coef_arrays[ci], dst_blk_y,
-	   (JDIMENSION) compptr->v_samp_factor, FALSE);
+        /* Bottom-edge blocks will be copied verbatim. */
+        src_buffer = (*srcinfo->mem->access_virt_barray)(
+            (j_common_ptr)srcinfo, src_coef_arrays[ci], dst_blk_y,
+            (JDIMENSION)compptr->v_samp_factor, FALSE);
       }
       for (offset_y = 0; offset_y < compptr->v_samp_factor; offset_y++) {
-	if (dst_blk_y < comp_height) {
-	  /* Row is within the mirrorable area. */
-	  dst_row_ptr = dst_buffer[offset_y];
-	  src_row_ptr = src_buffer[compptr->v_samp_factor - offset_y - 1];
-	  for (dst_blk_x = 0; dst_blk_x < compptr->width_in_blocks;
-	       dst_blk_x++) {
-	    dst_ptr = dst_row_ptr[dst_blk_x];
-	    src_ptr = src_row_ptr[dst_blk_x];
-	    for (i = 0; i < DCTSIZE; i += 2) {
-	      /* copy even row */
-	      for (j = 0; j < DCTSIZE; j++)
-		*dst_ptr++ = *src_ptr++;
-	      /* copy odd row with sign change */
-	      for (j = 0; j < DCTSIZE; j++)
-		*dst_ptr++ = - *src_ptr++;
-	    }
-	  }
-	} else {
-	  /* Just copy row verbatim. */
-	  jcopy_block_row(src_buffer[offset_y], dst_buffer[offset_y],
-			  compptr->width_in_blocks);
-	}
+        if (dst_blk_y < comp_height) {
+          /* Row is within the mirrorable area. */
+          dst_row_ptr = dst_buffer[offset_y];
+          src_row_ptr = src_buffer[compptr->v_samp_factor - offset_y - 1];
+          for (dst_blk_x = 0; dst_blk_x < compptr->width_in_blocks;
+               dst_blk_x++) {
+            dst_ptr = dst_row_ptr[dst_blk_x];
+            src_ptr = src_row_ptr[dst_blk_x];
+            for (i = 0; i < DCTSIZE; i += 2) {
+              /* copy even row */
+              for (j = 0; j < DCTSIZE; j++) *dst_ptr++ = *src_ptr++;
+              /* copy odd row with sign change */
+              for (j = 0; j < DCTSIZE; j++) *dst_ptr++ = -*src_ptr++;
+            }
+          }
+        } else {
+          /* Just copy row verbatim. */
+          jcopy_block_row(src_buffer[offset_y], dst_buffer[offset_y],
+                          compptr->width_in_blocks);
+        }
       }
     }
   }
 }
 
-static void
-do_transpose (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
-	      jvirt_barray_ptr *src_coef_arrays,
-	      jvirt_barray_ptr *dst_coef_arrays)
+static void do_transpose(j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
+                         jvirt_barray_ptr *src_coef_arrays,
+                         jvirt_barray_ptr *dst_coef_arrays)
 /* Transpose source into destination */
 {
   JDIMENSION dst_blk_x, dst_blk_y;
@@ -258,33 +255,32 @@ do_transpose (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
   for (ci = 0; ci < dstinfo->num_components; ci++) {
     compptr = dstinfo->comp_info + ci;
     for (dst_blk_y = 0; dst_blk_y < compptr->height_in_blocks;
-	 dst_blk_y += compptr->v_samp_factor) {
-      dst_buffer = (*srcinfo->mem->access_virt_barray)
-	((j_common_ptr) srcinfo, dst_coef_arrays[ci], dst_blk_y,
-	 (JDIMENSION) compptr->v_samp_factor, TRUE);
+         dst_blk_y += compptr->v_samp_factor) {
+      dst_buffer = (*srcinfo->mem->access_virt_barray)(
+          (j_common_ptr)srcinfo, dst_coef_arrays[ci], dst_blk_y,
+          (JDIMENSION)compptr->v_samp_factor, TRUE);
       for (offset_y = 0; offset_y < compptr->v_samp_factor; offset_y++) {
-	for (dst_blk_x = 0; dst_blk_x < compptr->width_in_blocks;
-	     dst_blk_x += compptr->h_samp_factor) {
-	  src_buffer = (*srcinfo->mem->access_virt_barray)
-	    ((j_common_ptr) srcinfo, src_coef_arrays[ci], dst_blk_x,
-	     (JDIMENSION) compptr->h_samp_factor, FALSE);
-	  for (offset_x = 0; offset_x < compptr->h_samp_factor; offset_x++) {
-	    src_ptr = src_buffer[offset_x][dst_blk_y + offset_y];
-	    dst_ptr = dst_buffer[offset_y][dst_blk_x + offset_x];
-	    for (i = 0; i < DCTSIZE; i++)
-	      for (j = 0; j < DCTSIZE; j++)
-		dst_ptr[j*DCTSIZE+i] = src_ptr[i*DCTSIZE+j];
-	  }
-	}
+        for (dst_blk_x = 0; dst_blk_x < compptr->width_in_blocks;
+             dst_blk_x += compptr->h_samp_factor) {
+          src_buffer = (*srcinfo->mem->access_virt_barray)(
+              (j_common_ptr)srcinfo, src_coef_arrays[ci], dst_blk_x,
+              (JDIMENSION)compptr->h_samp_factor, FALSE);
+          for (offset_x = 0; offset_x < compptr->h_samp_factor; offset_x++) {
+            src_ptr = src_buffer[offset_x][dst_blk_y + offset_y];
+            dst_ptr = dst_buffer[offset_y][dst_blk_x + offset_x];
+            for (i = 0; i < DCTSIZE; i++)
+              for (j = 0; j < DCTSIZE; j++)
+                dst_ptr[j * DCTSIZE + i] = src_ptr[i * DCTSIZE + j];
+          }
+        }
       }
     }
   }
 }
 
-static void
-do_rot_90 (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
-	   jvirt_barray_ptr *src_coef_arrays,
-	   jvirt_barray_ptr *dst_coef_arrays)
+static void do_rot_90(j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
+                      jvirt_barray_ptr *src_coef_arrays,
+                      jvirt_barray_ptr *dst_coef_arrays)
 /* 90 degree rotation is equivalent to
  *   1. Transposing the image;
  *   2. Horizontal mirroring.
@@ -307,47 +303,46 @@ do_rot_90 (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
     compptr = dstinfo->comp_info + ci;
     comp_width = MCU_cols * compptr->h_samp_factor;
     for (dst_blk_y = 0; dst_blk_y < compptr->height_in_blocks;
-	 dst_blk_y += compptr->v_samp_factor) {
-      dst_buffer = (*srcinfo->mem->access_virt_barray)
-	((j_common_ptr) srcinfo, dst_coef_arrays[ci], dst_blk_y,
-	 (JDIMENSION) compptr->v_samp_factor, TRUE);
+         dst_blk_y += compptr->v_samp_factor) {
+      dst_buffer = (*srcinfo->mem->access_virt_barray)(
+          (j_common_ptr)srcinfo, dst_coef_arrays[ci], dst_blk_y,
+          (JDIMENSION)compptr->v_samp_factor, TRUE);
       for (offset_y = 0; offset_y < compptr->v_samp_factor; offset_y++) {
-	for (dst_blk_x = 0; dst_blk_x < compptr->width_in_blocks;
-	     dst_blk_x += compptr->h_samp_factor) {
-	  src_buffer = (*srcinfo->mem->access_virt_barray)
-	    ((j_common_ptr) srcinfo, src_coef_arrays[ci], dst_blk_x,
-	     (JDIMENSION) compptr->h_samp_factor, FALSE);
-	  for (offset_x = 0; offset_x < compptr->h_samp_factor; offset_x++) {
-	    src_ptr = src_buffer[offset_x][dst_blk_y + offset_y];
-	    if (dst_blk_x < comp_width) {
-	      /* Block is within the mirrorable area. */
-	      dst_ptr = dst_buffer[offset_y]
-		[comp_width - dst_blk_x - offset_x - 1];
-	      for (i = 0; i < DCTSIZE; i++) {
-		for (j = 0; j < DCTSIZE; j++)
-		  dst_ptr[j*DCTSIZE+i] = src_ptr[i*DCTSIZE+j];
-		i++;
-		for (j = 0; j < DCTSIZE; j++)
-		  dst_ptr[j*DCTSIZE+i] = -src_ptr[i*DCTSIZE+j];
-	      }
-	    } else {
-	      /* Edge blocks are transposed but not mirrored. */
-	      dst_ptr = dst_buffer[offset_y][dst_blk_x + offset_x];
-	      for (i = 0; i < DCTSIZE; i++)
-		for (j = 0; j < DCTSIZE; j++)
-		  dst_ptr[j*DCTSIZE+i] = src_ptr[i*DCTSIZE+j];
-	    }
-	  }
-	}
+        for (dst_blk_x = 0; dst_blk_x < compptr->width_in_blocks;
+             dst_blk_x += compptr->h_samp_factor) {
+          src_buffer = (*srcinfo->mem->access_virt_barray)(
+              (j_common_ptr)srcinfo, src_coef_arrays[ci], dst_blk_x,
+              (JDIMENSION)compptr->h_samp_factor, FALSE);
+          for (offset_x = 0; offset_x < compptr->h_samp_factor; offset_x++) {
+            src_ptr = src_buffer[offset_x][dst_blk_y + offset_y];
+            if (dst_blk_x < comp_width) {
+              /* Block is within the mirrorable area. */
+              dst_ptr =
+                  dst_buffer[offset_y][comp_width - dst_blk_x - offset_x - 1];
+              for (i = 0; i < DCTSIZE; i++) {
+                for (j = 0; j < DCTSIZE; j++)
+                  dst_ptr[j * DCTSIZE + i] = src_ptr[i * DCTSIZE + j];
+                i++;
+                for (j = 0; j < DCTSIZE; j++)
+                  dst_ptr[j * DCTSIZE + i] = -src_ptr[i * DCTSIZE + j];
+              }
+            } else {
+              /* Edge blocks are transposed but not mirrored. */
+              dst_ptr = dst_buffer[offset_y][dst_blk_x + offset_x];
+              for (i = 0; i < DCTSIZE; i++)
+                for (j = 0; j < DCTSIZE; j++)
+                  dst_ptr[j * DCTSIZE + i] = src_ptr[i * DCTSIZE + j];
+            }
+          }
+        }
       }
     }
   }
 }
 
-static void
-do_rot_270 (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
-	    jvirt_barray_ptr *src_coef_arrays,
-	    jvirt_barray_ptr *dst_coef_arrays)
+static void do_rot_270(j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
+                       jvirt_barray_ptr *src_coef_arrays,
+                       jvirt_barray_ptr *dst_coef_arrays)
 /* 270 degree rotation is equivalent to
  *   1. Horizontal mirroring;
  *   2. Transposing the image.
@@ -370,47 +365,46 @@ do_rot_270 (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
     compptr = dstinfo->comp_info + ci;
     comp_height = MCU_rows * compptr->v_samp_factor;
     for (dst_blk_y = 0; dst_blk_y < compptr->height_in_blocks;
-	 dst_blk_y += compptr->v_samp_factor) {
-      dst_buffer = (*srcinfo->mem->access_virt_barray)
-	((j_common_ptr) srcinfo, dst_coef_arrays[ci], dst_blk_y,
-	 (JDIMENSION) compptr->v_samp_factor, TRUE);
+         dst_blk_y += compptr->v_samp_factor) {
+      dst_buffer = (*srcinfo->mem->access_virt_barray)(
+          (j_common_ptr)srcinfo, dst_coef_arrays[ci], dst_blk_y,
+          (JDIMENSION)compptr->v_samp_factor, TRUE);
       for (offset_y = 0; offset_y < compptr->v_samp_factor; offset_y++) {
-	for (dst_blk_x = 0; dst_blk_x < compptr->width_in_blocks;
-	     dst_blk_x += compptr->h_samp_factor) {
-	  src_buffer = (*srcinfo->mem->access_virt_barray)
-	    ((j_common_ptr) srcinfo, src_coef_arrays[ci], dst_blk_x,
-	     (JDIMENSION) compptr->h_samp_factor, FALSE);
-	  for (offset_x = 0; offset_x < compptr->h_samp_factor; offset_x++) {
-	    dst_ptr = dst_buffer[offset_y][dst_blk_x + offset_x];
-	    if (dst_blk_y < comp_height) {
-	      /* Block is within the mirrorable area. */
-	      src_ptr = src_buffer[offset_x]
-		[comp_height - dst_blk_y - offset_y - 1];
-	      for (i = 0; i < DCTSIZE; i++) {
-		for (j = 0; j < DCTSIZE; j++) {
-		  dst_ptr[j*DCTSIZE+i] = src_ptr[i*DCTSIZE+j];
-		  j++;
-		  dst_ptr[j*DCTSIZE+i] = -src_ptr[i*DCTSIZE+j];
-		}
-	      }
-	    } else {
-	      /* Edge blocks are transposed but not mirrored. */
-	      src_ptr = src_buffer[offset_x][dst_blk_y + offset_y];
-	      for (i = 0; i < DCTSIZE; i++)
-		for (j = 0; j < DCTSIZE; j++)
-		  dst_ptr[j*DCTSIZE+i] = src_ptr[i*DCTSIZE+j];
-	    }
-	  }
-	}
+        for (dst_blk_x = 0; dst_blk_x < compptr->width_in_blocks;
+             dst_blk_x += compptr->h_samp_factor) {
+          src_buffer = (*srcinfo->mem->access_virt_barray)(
+              (j_common_ptr)srcinfo, src_coef_arrays[ci], dst_blk_x,
+              (JDIMENSION)compptr->h_samp_factor, FALSE);
+          for (offset_x = 0; offset_x < compptr->h_samp_factor; offset_x++) {
+            dst_ptr = dst_buffer[offset_y][dst_blk_x + offset_x];
+            if (dst_blk_y < comp_height) {
+              /* Block is within the mirrorable area. */
+              src_ptr =
+                  src_buffer[offset_x][comp_height - dst_blk_y - offset_y - 1];
+              for (i = 0; i < DCTSIZE; i++) {
+                for (j = 0; j < DCTSIZE; j++) {
+                  dst_ptr[j * DCTSIZE + i] = src_ptr[i * DCTSIZE + j];
+                  j++;
+                  dst_ptr[j * DCTSIZE + i] = -src_ptr[i * DCTSIZE + j];
+                }
+              }
+            } else {
+              /* Edge blocks are transposed but not mirrored. */
+              src_ptr = src_buffer[offset_x][dst_blk_y + offset_y];
+              for (i = 0; i < DCTSIZE; i++)
+                for (j = 0; j < DCTSIZE; j++)
+                  dst_ptr[j * DCTSIZE + i] = src_ptr[i * DCTSIZE + j];
+            }
+          }
+        }
       }
     }
   }
 }
 
-static void
-do_rot_180 (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
-	    jvirt_barray_ptr *src_coef_arrays,
-	    jvirt_barray_ptr *dst_coef_arrays)
+static void do_rot_180(j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
+                       jvirt_barray_ptr *src_coef_arrays,
+                       jvirt_barray_ptr *dst_coef_arrays)
 /* 180 degree rotation is equivalent to
  *   1. Vertical mirroring;
  *   2. Horizontal mirroring.
@@ -432,85 +426,81 @@ do_rot_180 (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
     comp_width = MCU_cols * compptr->h_samp_factor;
     comp_height = MCU_rows * compptr->v_samp_factor;
     for (dst_blk_y = 0; dst_blk_y < compptr->height_in_blocks;
-	 dst_blk_y += compptr->v_samp_factor) {
-      dst_buffer = (*srcinfo->mem->access_virt_barray)
-	((j_common_ptr) srcinfo, dst_coef_arrays[ci], dst_blk_y,
-	 (JDIMENSION) compptr->v_samp_factor, TRUE);
+         dst_blk_y += compptr->v_samp_factor) {
+      dst_buffer = (*srcinfo->mem->access_virt_barray)(
+          (j_common_ptr)srcinfo, dst_coef_arrays[ci], dst_blk_y,
+          (JDIMENSION)compptr->v_samp_factor, TRUE);
       if (dst_blk_y < comp_height) {
-	/* Row is within the vertically mirrorable area. */
-	src_buffer = (*srcinfo->mem->access_virt_barray)
-	  ((j_common_ptr) srcinfo, src_coef_arrays[ci],
-	   comp_height - dst_blk_y - (JDIMENSION) compptr->v_samp_factor,
-	   (JDIMENSION) compptr->v_samp_factor, FALSE);
+        /* Row is within the vertically mirrorable area. */
+        src_buffer = (*srcinfo->mem->access_virt_barray)(
+            (j_common_ptr)srcinfo, src_coef_arrays[ci],
+            comp_height - dst_blk_y - (JDIMENSION)compptr->v_samp_factor,
+            (JDIMENSION)compptr->v_samp_factor, FALSE);
       } else {
-	/* Bottom-edge rows are only mirrored horizontally. */
-	src_buffer = (*srcinfo->mem->access_virt_barray)
-	  ((j_common_ptr) srcinfo, src_coef_arrays[ci], dst_blk_y,
-	   (JDIMENSION) compptr->v_samp_factor, FALSE);
+        /* Bottom-edge rows are only mirrored horizontally. */
+        src_buffer = (*srcinfo->mem->access_virt_barray)(
+            (j_common_ptr)srcinfo, src_coef_arrays[ci], dst_blk_y,
+            (JDIMENSION)compptr->v_samp_factor, FALSE);
       }
       for (offset_y = 0; offset_y < compptr->v_samp_factor; offset_y++) {
-	if (dst_blk_y < comp_height) {
-	  /* Row is within the mirrorable area. */
-	  dst_row_ptr = dst_buffer[offset_y];
-	  src_row_ptr = src_buffer[compptr->v_samp_factor - offset_y - 1];
-	  /* Process the blocks that can be mirrored both ways. */
-	  for (dst_blk_x = 0; dst_blk_x < comp_width; dst_blk_x++) {
-	    dst_ptr = dst_row_ptr[dst_blk_x];
-	    src_ptr = src_row_ptr[comp_width - dst_blk_x - 1];
-	    for (i = 0; i < DCTSIZE; i += 2) {
-	      /* For even row, negate every odd column. */
-	      for (j = 0; j < DCTSIZE; j += 2) {
-		*dst_ptr++ = *src_ptr++;
-		*dst_ptr++ = - *src_ptr++;
-	      }
-	      /* For odd row, negate every even column. */
-	      for (j = 0; j < DCTSIZE; j += 2) {
-		*dst_ptr++ = - *src_ptr++;
-		*dst_ptr++ = *src_ptr++;
-	      }
-	    }
-	  }
-	  /* Any remaining right-edge blocks are only mirrored vertically. */
-	  for (; dst_blk_x < compptr->width_in_blocks; dst_blk_x++) {
-	    dst_ptr = dst_row_ptr[dst_blk_x];
-	    src_ptr = src_row_ptr[dst_blk_x];
-	    for (i = 0; i < DCTSIZE; i += 2) {
-	      for (j = 0; j < DCTSIZE; j++)
-		*dst_ptr++ = *src_ptr++;
-	      for (j = 0; j < DCTSIZE; j++)
-		*dst_ptr++ = - *src_ptr++;
-	    }
-	  }
-	} else {
-	  /* Remaining rows are just mirrored horizontally. */
-	  dst_row_ptr = dst_buffer[offset_y];
-	  src_row_ptr = src_buffer[offset_y];
-	  /* Process the blocks that can be mirrored. */
-	  for (dst_blk_x = 0; dst_blk_x < comp_width; dst_blk_x++) {
-	    dst_ptr = dst_row_ptr[dst_blk_x];
-	    src_ptr = src_row_ptr[comp_width - dst_blk_x - 1];
-	    for (i = 0; i < DCTSIZE2; i += 2) {
-	      *dst_ptr++ = *src_ptr++;
-	      *dst_ptr++ = - *src_ptr++;
-	    }
-	  }
-	  /* Any remaining right-edge blocks are only copied. */
-	  for (; dst_blk_x < compptr->width_in_blocks; dst_blk_x++) {
-	    dst_ptr = dst_row_ptr[dst_blk_x];
-	    src_ptr = src_row_ptr[dst_blk_x];
-	    for (i = 0; i < DCTSIZE2; i++)
-	      *dst_ptr++ = *src_ptr++;
-	  }
-	}
+        if (dst_blk_y < comp_height) {
+          /* Row is within the mirrorable area. */
+          dst_row_ptr = dst_buffer[offset_y];
+          src_row_ptr = src_buffer[compptr->v_samp_factor - offset_y - 1];
+          /* Process the blocks that can be mirrored both ways. */
+          for (dst_blk_x = 0; dst_blk_x < comp_width; dst_blk_x++) {
+            dst_ptr = dst_row_ptr[dst_blk_x];
+            src_ptr = src_row_ptr[comp_width - dst_blk_x - 1];
+            for (i = 0; i < DCTSIZE; i += 2) {
+              /* For even row, negate every odd column. */
+              for (j = 0; j < DCTSIZE; j += 2) {
+                *dst_ptr++ = *src_ptr++;
+                *dst_ptr++ = -*src_ptr++;
+              }
+              /* For odd row, negate every even column. */
+              for (j = 0; j < DCTSIZE; j += 2) {
+                *dst_ptr++ = -*src_ptr++;
+                *dst_ptr++ = *src_ptr++;
+              }
+            }
+          }
+          /* Any remaining right-edge blocks are only mirrored vertically. */
+          for (; dst_blk_x < compptr->width_in_blocks; dst_blk_x++) {
+            dst_ptr = dst_row_ptr[dst_blk_x];
+            src_ptr = src_row_ptr[dst_blk_x];
+            for (i = 0; i < DCTSIZE; i += 2) {
+              for (j = 0; j < DCTSIZE; j++) *dst_ptr++ = *src_ptr++;
+              for (j = 0; j < DCTSIZE; j++) *dst_ptr++ = -*src_ptr++;
+            }
+          }
+        } else {
+          /* Remaining rows are just mirrored horizontally. */
+          dst_row_ptr = dst_buffer[offset_y];
+          src_row_ptr = src_buffer[offset_y];
+          /* Process the blocks that can be mirrored. */
+          for (dst_blk_x = 0; dst_blk_x < comp_width; dst_blk_x++) {
+            dst_ptr = dst_row_ptr[dst_blk_x];
+            src_ptr = src_row_ptr[comp_width - dst_blk_x - 1];
+            for (i = 0; i < DCTSIZE2; i += 2) {
+              *dst_ptr++ = *src_ptr++;
+              *dst_ptr++ = -*src_ptr++;
+            }
+          }
+          /* Any remaining right-edge blocks are only copied. */
+          for (; dst_blk_x < compptr->width_in_blocks; dst_blk_x++) {
+            dst_ptr = dst_row_ptr[dst_blk_x];
+            src_ptr = src_row_ptr[dst_blk_x];
+            for (i = 0; i < DCTSIZE2; i++) *dst_ptr++ = *src_ptr++;
+          }
+        }
       }
     }
   }
 }
 
-static void
-do_transverse (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
-	       jvirt_barray_ptr *src_coef_arrays,
-	       jvirt_barray_ptr *dst_coef_arrays)
+static void do_transverse(j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
+                          jvirt_barray_ptr *src_coef_arrays,
+                          jvirt_barray_ptr *dst_coef_arrays)
 /* Transverse transpose is equivalent to
  *   1. 180 degree rotation;
  *   2. Transposition;
@@ -535,71 +525,71 @@ do_transverse (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
     comp_width = MCU_cols * compptr->h_samp_factor;
     comp_height = MCU_rows * compptr->v_samp_factor;
     for (dst_blk_y = 0; dst_blk_y < compptr->height_in_blocks;
-	 dst_blk_y += compptr->v_samp_factor) {
-      dst_buffer = (*srcinfo->mem->access_virt_barray)
-	((j_common_ptr) srcinfo, dst_coef_arrays[ci], dst_blk_y,
-	 (JDIMENSION) compptr->v_samp_factor, TRUE);
+         dst_blk_y += compptr->v_samp_factor) {
+      dst_buffer = (*srcinfo->mem->access_virt_barray)(
+          (j_common_ptr)srcinfo, dst_coef_arrays[ci], dst_blk_y,
+          (JDIMENSION)compptr->v_samp_factor, TRUE);
       for (offset_y = 0; offset_y < compptr->v_samp_factor; offset_y++) {
-	for (dst_blk_x = 0; dst_blk_x < compptr->width_in_blocks;
-	     dst_blk_x += compptr->h_samp_factor) {
-	  src_buffer = (*srcinfo->mem->access_virt_barray)
-	    ((j_common_ptr) srcinfo, src_coef_arrays[ci], dst_blk_x,
-	     (JDIMENSION) compptr->h_samp_factor, FALSE);
-	  for (offset_x = 0; offset_x < compptr->h_samp_factor; offset_x++) {
-	    if (dst_blk_y < comp_height) {
-	      src_ptr = src_buffer[offset_x]
-		[comp_height - dst_blk_y - offset_y - 1];
-	      if (dst_blk_x < comp_width) {
-		/* Block is within the mirrorable area. */
-		dst_ptr = dst_buffer[offset_y]
-		  [comp_width - dst_blk_x - offset_x - 1];
-		for (i = 0; i < DCTSIZE; i++) {
-		  for (j = 0; j < DCTSIZE; j++) {
-		    dst_ptr[j*DCTSIZE+i] = src_ptr[i*DCTSIZE+j];
-		    j++;
-		    dst_ptr[j*DCTSIZE+i] = -src_ptr[i*DCTSIZE+j];
-		  }
-		  i++;
-		  for (j = 0; j < DCTSIZE; j++) {
-		    dst_ptr[j*DCTSIZE+i] = -src_ptr[i*DCTSIZE+j];
-		    j++;
-		    dst_ptr[j*DCTSIZE+i] = src_ptr[i*DCTSIZE+j];
-		  }
-		}
-	      } else {
-		/* Right-edge blocks are mirrored in y only */
-		dst_ptr = dst_buffer[offset_y][dst_blk_x + offset_x];
-		for (i = 0; i < DCTSIZE; i++) {
-		  for (j = 0; j < DCTSIZE; j++) {
-		    dst_ptr[j*DCTSIZE+i] = src_ptr[i*DCTSIZE+j];
-		    j++;
-		    dst_ptr[j*DCTSIZE+i] = -src_ptr[i*DCTSIZE+j];
-		  }
-		}
-	      }
-	    } else {
-	      src_ptr = src_buffer[offset_x][dst_blk_y + offset_y];
-	      if (dst_blk_x < comp_width) {
-		/* Bottom-edge blocks are mirrored in x only */
-		dst_ptr = dst_buffer[offset_y]
-		  [comp_width - dst_blk_x - offset_x - 1];
-		for (i = 0; i < DCTSIZE; i++) {
-		  for (j = 0; j < DCTSIZE; j++)
-		    dst_ptr[j*DCTSIZE+i] = src_ptr[i*DCTSIZE+j];
-		  i++;
-		  for (j = 0; j < DCTSIZE; j++)
-		    dst_ptr[j*DCTSIZE+i] = -src_ptr[i*DCTSIZE+j];
-		}
-	      } else {
-		/* At lower right corner, just transpose, no mirroring */
-		dst_ptr = dst_buffer[offset_y][dst_blk_x + offset_x];
-		for (i = 0; i < DCTSIZE; i++)
-		  for (j = 0; j < DCTSIZE; j++)
-		    dst_ptr[j*DCTSIZE+i] = src_ptr[i*DCTSIZE+j];
-	      }
-	    }
-	  }
-	}
+        for (dst_blk_x = 0; dst_blk_x < compptr->width_in_blocks;
+             dst_blk_x += compptr->h_samp_factor) {
+          src_buffer = (*srcinfo->mem->access_virt_barray)(
+              (j_common_ptr)srcinfo, src_coef_arrays[ci], dst_blk_x,
+              (JDIMENSION)compptr->h_samp_factor, FALSE);
+          for (offset_x = 0; offset_x < compptr->h_samp_factor; offset_x++) {
+            if (dst_blk_y < comp_height) {
+              src_ptr =
+                  src_buffer[offset_x][comp_height - dst_blk_y - offset_y - 1];
+              if (dst_blk_x < comp_width) {
+                /* Block is within the mirrorable area. */
+                dst_ptr =
+                    dst_buffer[offset_y][comp_width - dst_blk_x - offset_x - 1];
+                for (i = 0; i < DCTSIZE; i++) {
+                  for (j = 0; j < DCTSIZE; j++) {
+                    dst_ptr[j * DCTSIZE + i] = src_ptr[i * DCTSIZE + j];
+                    j++;
+                    dst_ptr[j * DCTSIZE + i] = -src_ptr[i * DCTSIZE + j];
+                  }
+                  i++;
+                  for (j = 0; j < DCTSIZE; j++) {
+                    dst_ptr[j * DCTSIZE + i] = -src_ptr[i * DCTSIZE + j];
+                    j++;
+                    dst_ptr[j * DCTSIZE + i] = src_ptr[i * DCTSIZE + j];
+                  }
+                }
+              } else {
+                /* Right-edge blocks are mirrored in y only */
+                dst_ptr = dst_buffer[offset_y][dst_blk_x + offset_x];
+                for (i = 0; i < DCTSIZE; i++) {
+                  for (j = 0; j < DCTSIZE; j++) {
+                    dst_ptr[j * DCTSIZE + i] = src_ptr[i * DCTSIZE + j];
+                    j++;
+                    dst_ptr[j * DCTSIZE + i] = -src_ptr[i * DCTSIZE + j];
+                  }
+                }
+              }
+            } else {
+              src_ptr = src_buffer[offset_x][dst_blk_y + offset_y];
+              if (dst_blk_x < comp_width) {
+                /* Bottom-edge blocks are mirrored in x only */
+                dst_ptr =
+                    dst_buffer[offset_y][comp_width - dst_blk_x - offset_x - 1];
+                for (i = 0; i < DCTSIZE; i++) {
+                  for (j = 0; j < DCTSIZE; j++)
+                    dst_ptr[j * DCTSIZE + i] = src_ptr[i * DCTSIZE + j];
+                  i++;
+                  for (j = 0; j < DCTSIZE; j++)
+                    dst_ptr[j * DCTSIZE + i] = -src_ptr[i * DCTSIZE + j];
+                }
+              } else {
+                /* At lower right corner, just transpose, no mirroring */
+                dst_ptr = dst_buffer[offset_y][dst_blk_x + offset_x];
+                for (i = 0; i < DCTSIZE; i++)
+                  for (j = 0; j < DCTSIZE; j++)
+                    dst_ptr[j * DCTSIZE + i] = src_ptr[i * DCTSIZE + j];
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -615,16 +605,13 @@ do_transverse (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
  * the source's virtual arrays).
  */
 
-void
-jtransform_request_workspace (j_decompress_ptr srcinfo,
-			      jpeg_transform_info *info)
-{
+void jtransform_request_workspace(j_decompress_ptr srcinfo,
+                                  jpeg_transform_info *info) {
   jvirt_barray_ptr *coef_arrays = NULL;
   jpeg_component_info *compptr;
   int ci;
 
-  if (info->force_grayscale &&
-      srcinfo->jpeg_color_space == JCS_YCbCr &&
+  if (info->force_grayscale && srcinfo->jpeg_color_space == JCS_YCbCr &&
       srcinfo->num_components == 3) {
     /* We'll only process the first component */
     info->num_components = 1;
@@ -634,61 +621,59 @@ jtransform_request_workspace (j_decompress_ptr srcinfo,
   }
 
   switch (info->transform) {
-  case JXFORM_NONE:
-  case JXFORM_FLIP_H:
-    /* Don't need a workspace array */
-    break;
-  case JXFORM_FLIP_V:
-  case JXFORM_ROT_180:
-    /* Need workspace arrays having same dimensions as source image.
-     * Note that we allocate arrays padded out to the next iMCU boundary,
-     * so that transform routines need not worry about missing edge blocks.
-     */
-    coef_arrays = (jvirt_barray_ptr *)
-      (*srcinfo->mem->alloc_small) ((j_common_ptr) srcinfo, JPOOL_IMAGE,
-	sizeof(jvirt_barray_ptr) * info->num_components);
-    for (ci = 0; ci < info->num_components; ci++) {
-      compptr = srcinfo->comp_info + ci;
-      coef_arrays[ci] = (*srcinfo->mem->request_virt_barray)
-	((j_common_ptr) srcinfo, JPOOL_IMAGE, FALSE,
-	 (JDIMENSION) jround_up((long) compptr->width_in_blocks,
-				(long) compptr->h_samp_factor),
-	 (JDIMENSION) jround_up((long) compptr->height_in_blocks,
-				(long) compptr->v_samp_factor),
-	 (JDIMENSION) compptr->v_samp_factor);
-    }
-    break;
-  case JXFORM_TRANSPOSE:
-  case JXFORM_TRANSVERSE:
-  case JXFORM_ROT_90:
-  case JXFORM_ROT_270:
-    /* Need workspace arrays having transposed dimensions.
-     * Note that we allocate arrays padded out to the next iMCU boundary,
-     * so that transform routines need not worry about missing edge blocks.
-     */
-    coef_arrays = (jvirt_barray_ptr *)
-      (*srcinfo->mem->alloc_small) ((j_common_ptr) srcinfo, JPOOL_IMAGE,
-	sizeof(jvirt_barray_ptr) * info->num_components);
-    for (ci = 0; ci < info->num_components; ci++) {
-      compptr = srcinfo->comp_info + ci;
-      coef_arrays[ci] = (*srcinfo->mem->request_virt_barray)
-	((j_common_ptr) srcinfo, JPOOL_IMAGE, FALSE,
-	 (JDIMENSION) jround_up((long) compptr->height_in_blocks,
-				(long) compptr->v_samp_factor),
-	 (JDIMENSION) jround_up((long) compptr->width_in_blocks,
-				(long) compptr->h_samp_factor),
-	 (JDIMENSION) compptr->h_samp_factor);
-    }
-    break;
+    case JXFORM_NONE:
+    case JXFORM_FLIP_H:
+      /* Don't need a workspace array */
+      break;
+    case JXFORM_FLIP_V:
+    case JXFORM_ROT_180:
+      /* Need workspace arrays having same dimensions as source image.
+       * Note that we allocate arrays padded out to the next iMCU boundary,
+       * so that transform routines need not worry about missing edge blocks.
+       */
+      coef_arrays = (jvirt_barray_ptr *)(*srcinfo->mem->alloc_small)(
+          (j_common_ptr)srcinfo, JPOOL_IMAGE,
+          sizeof(jvirt_barray_ptr) * info->num_components);
+      for (ci = 0; ci < info->num_components; ci++) {
+        compptr = srcinfo->comp_info + ci;
+        coef_arrays[ci] = (*srcinfo->mem->request_virt_barray)(
+            (j_common_ptr)srcinfo, JPOOL_IMAGE, FALSE,
+            (JDIMENSION)jround_up((long)compptr->width_in_blocks,
+                                  (long)compptr->h_samp_factor),
+            (JDIMENSION)jround_up((long)compptr->height_in_blocks,
+                                  (long)compptr->v_samp_factor),
+            (JDIMENSION)compptr->v_samp_factor);
+      }
+      break;
+    case JXFORM_TRANSPOSE:
+    case JXFORM_TRANSVERSE:
+    case JXFORM_ROT_90:
+    case JXFORM_ROT_270:
+      /* Need workspace arrays having transposed dimensions.
+       * Note that we allocate arrays padded out to the next iMCU boundary,
+       * so that transform routines need not worry about missing edge blocks.
+       */
+      coef_arrays = (jvirt_barray_ptr *)(*srcinfo->mem->alloc_small)(
+          (j_common_ptr)srcinfo, JPOOL_IMAGE,
+          sizeof(jvirt_barray_ptr) * info->num_components);
+      for (ci = 0; ci < info->num_components; ci++) {
+        compptr = srcinfo->comp_info + ci;
+        coef_arrays[ci] = (*srcinfo->mem->request_virt_barray)(
+            (j_common_ptr)srcinfo, JPOOL_IMAGE, FALSE,
+            (JDIMENSION)jround_up((long)compptr->height_in_blocks,
+                                  (long)compptr->v_samp_factor),
+            (JDIMENSION)jround_up((long)compptr->width_in_blocks,
+                                  (long)compptr->h_samp_factor),
+            (JDIMENSION)compptr->h_samp_factor);
+      }
+      break;
   }
   info->workspace_coef_arrays = coef_arrays;
 }
 
 /* Transpose destination image parameters */
 
-static void
-transpose_critical_parameters (j_compress_ptr dstinfo)
-{
+static void transpose_critical_parameters(j_compress_ptr dstinfo) {
   int tblno, i, j, ci, itemp;
   jpeg_component_info *compptr;
   JQUANT_TBL *qtblptr;
@@ -713,11 +698,12 @@ transpose_critical_parameters (j_compress_ptr dstinfo)
     qtblptr = dstinfo->quant_tbl_ptrs[tblno];
     if (qtblptr != NULL) {
       for (i = 0; i < DCTSIZE; i++) {
-	for (j = 0; j < i; j++) {
-	  qtemp = qtblptr->quantval[i*DCTSIZE+j];
-	  qtblptr->quantval[i*DCTSIZE+j] = qtblptr->quantval[j*DCTSIZE+i];
-	  qtblptr->quantval[j*DCTSIZE+i] = qtemp;
-	}
+        for (j = 0; j < i; j++) {
+          qtemp = qtblptr->quantval[i * DCTSIZE + j];
+          qtblptr->quantval[i * DCTSIZE + j] =
+              qtblptr->quantval[j * DCTSIZE + i];
+          qtblptr->quantval[j * DCTSIZE + i] = qtemp;
+        }
       }
     }
   }
@@ -725,9 +711,7 @@ transpose_critical_parameters (j_compress_ptr dstinfo)
 
 /* Trim off any partial iMCUs on the indicated destination edge */
 
-static void
-trim_right_edge (j_compress_ptr dstinfo)
-{
+static void trim_right_edge(j_compress_ptr dstinfo) {
   int ci, max_h_samp_factor;
   JDIMENSION MCU_cols;
 
@@ -741,13 +725,11 @@ trim_right_edge (j_compress_ptr dstinfo)
     max_h_samp_factor = MAX(max_h_samp_factor, h_samp_factor);
   }
   MCU_cols = dstinfo->image_width / (max_h_samp_factor * DCTSIZE);
-  if (MCU_cols > 0)		/* can't trim to 0 pixels */
+  if (MCU_cols > 0) /* can't trim to 0 pixels */
     dstinfo->image_width = MCU_cols * (max_h_samp_factor * DCTSIZE);
 }
 
-static void
-trim_bottom_edge (j_compress_ptr dstinfo)
-{
+static void trim_bottom_edge(j_compress_ptr dstinfo) {
   int ci, max_v_samp_factor;
   JDIMENSION MCU_rows;
 
@@ -761,7 +743,7 @@ trim_bottom_edge (j_compress_ptr dstinfo)
     max_v_samp_factor = MAX(max_v_samp_factor, v_samp_factor);
   }
   MCU_rows = dstinfo->image_height / (max_v_samp_factor * DCTSIZE);
-  if (MCU_rows > 0)		/* can't trim to 0 pixels */
+  if (MCU_rows > 0) /* can't trim to 0 pixels */
     dstinfo->image_height = MCU_rows * (max_v_samp_factor * DCTSIZE);
 }
 
@@ -776,12 +758,9 @@ trim_bottom_edge (j_compress_ptr dstinfo)
  * to jpeg_write_coefficients().
  */
 
-jvirt_barray_ptr *
-jtransform_adjust_parameters (j_decompress_ptr srcinfo,
-			      j_compress_ptr dstinfo,
-			      jvirt_barray_ptr *src_coef_arrays,
-			      jpeg_transform_info *info)
-{
+jvirt_barray_ptr *jtransform_adjust_parameters(
+    j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
+    jvirt_barray_ptr *src_coef_arrays, jpeg_transform_info *info) {
   /* If force-to-grayscale is requested, adjust destination parameters */
   if (info->force_grayscale) {
     /* We use jpeg_set_colorspace to make sure subsidiary settings get fixed
@@ -792,9 +771,9 @@ jtransform_adjust_parameters (j_decompress_ptr srcinfo,
      * factors to the customary 1,1.  (Some decoders fail on other factors.)
      */
     if ((dstinfo->jpeg_color_space == JCS_YCbCr &&
-	 dstinfo->num_components == 3) ||
-	(dstinfo->jpeg_color_space == JCS_GRAYSCALE &&
-	 dstinfo->num_components == 1)) {
+         dstinfo->num_components == 3) ||
+        (dstinfo->jpeg_color_space == JCS_GRAYSCALE &&
+         dstinfo->num_components == 1)) {
       /* We have to preserve the source's quantization table number. */
       int sv_quant_tbl_no = dstinfo->comp_info[0].quant_tbl_no;
       jpeg_set_colorspace(dstinfo, JCS_GRAYSCALE);
@@ -807,49 +786,44 @@ jtransform_adjust_parameters (j_decompress_ptr srcinfo,
 
   /* Correct the destination's image dimensions etc if necessary */
   switch (info->transform) {
-  case JXFORM_NONE:
-    /* Nothing to do */
-    break;
-  case JXFORM_FLIP_H:
-    if (info->trim)
-      trim_right_edge(dstinfo);
-    break;
-  case JXFORM_FLIP_V:
-    if (info->trim)
-      trim_bottom_edge(dstinfo);
-    break;
-  case JXFORM_TRANSPOSE:
-    transpose_critical_parameters(dstinfo);
-    /* transpose does NOT have to trim anything */
-    break;
-  case JXFORM_TRANSVERSE:
-    transpose_critical_parameters(dstinfo);
-    if (info->trim) {
-      trim_right_edge(dstinfo);
-      trim_bottom_edge(dstinfo);
-    }
-    break;
-  case JXFORM_ROT_90:
-    transpose_critical_parameters(dstinfo);
-    if (info->trim)
-      trim_right_edge(dstinfo);
-    break;
-  case JXFORM_ROT_180:
-    if (info->trim) {
-      trim_right_edge(dstinfo);
-      trim_bottom_edge(dstinfo);
-    }
-    break;
-  case JXFORM_ROT_270:
-    transpose_critical_parameters(dstinfo);
-    if (info->trim)
-      trim_bottom_edge(dstinfo);
-    break;
+    case JXFORM_NONE:
+      /* Nothing to do */
+      break;
+    case JXFORM_FLIP_H:
+      if (info->trim) trim_right_edge(dstinfo);
+      break;
+    case JXFORM_FLIP_V:
+      if (info->trim) trim_bottom_edge(dstinfo);
+      break;
+    case JXFORM_TRANSPOSE:
+      transpose_critical_parameters(dstinfo);
+      /* transpose does NOT have to trim anything */
+      break;
+    case JXFORM_TRANSVERSE:
+      transpose_critical_parameters(dstinfo);
+      if (info->trim) {
+        trim_right_edge(dstinfo);
+        trim_bottom_edge(dstinfo);
+      }
+      break;
+    case JXFORM_ROT_90:
+      transpose_critical_parameters(dstinfo);
+      if (info->trim) trim_right_edge(dstinfo);
+      break;
+    case JXFORM_ROT_180:
+      if (info->trim) {
+        trim_right_edge(dstinfo);
+        trim_bottom_edge(dstinfo);
+      }
+      break;
+    case JXFORM_ROT_270:
+      transpose_critical_parameters(dstinfo);
+      if (info->trim) trim_bottom_edge(dstinfo);
+      break;
   }
 
   /* Return the appropriate output data set */
-  if (info->workspace_coef_arrays != NULL)
-    return info->workspace_coef_arrays;
+  if (info->workspace_coef_arrays != NULL) return info->workspace_coef_arrays;
   return src_coef_arrays;
 }
 
@@ -862,38 +836,36 @@ jtransform_adjust_parameters (j_decompress_ptr srcinfo,
  * Note that some transformations will modify the source data arrays!
  */
 
-void
-jtransform_execute_transformation (j_decompress_ptr srcinfo,
-				   j_compress_ptr dstinfo,
-				   jvirt_barray_ptr *src_coef_arrays,
-				   jpeg_transform_info *info)
-{
+void jtransform_execute_transformation(j_decompress_ptr srcinfo,
+                                       j_compress_ptr dstinfo,
+                                       jvirt_barray_ptr *src_coef_arrays,
+                                       jpeg_transform_info *info) {
   jvirt_barray_ptr *dst_coef_arrays = info->workspace_coef_arrays;
 
   switch (info->transform) {
-  case JXFORM_NONE:
-    break;
-  case JXFORM_FLIP_H:
-    do_flip_h(srcinfo, dstinfo, src_coef_arrays);
-    break;
-  case JXFORM_FLIP_V:
-    do_flip_v(srcinfo, dstinfo, src_coef_arrays, dst_coef_arrays);
-    break;
-  case JXFORM_TRANSPOSE:
-    do_transpose(srcinfo, dstinfo, src_coef_arrays, dst_coef_arrays);
-    break;
-  case JXFORM_TRANSVERSE:
-    do_transverse(srcinfo, dstinfo, src_coef_arrays, dst_coef_arrays);
-    break;
-  case JXFORM_ROT_90:
-    do_rot_90(srcinfo, dstinfo, src_coef_arrays, dst_coef_arrays);
-    break;
-  case JXFORM_ROT_180:
-    do_rot_180(srcinfo, dstinfo, src_coef_arrays, dst_coef_arrays);
-    break;
-  case JXFORM_ROT_270:
-    do_rot_270(srcinfo, dstinfo, src_coef_arrays, dst_coef_arrays);
-    break;
+    case JXFORM_NONE:
+      break;
+    case JXFORM_FLIP_H:
+      do_flip_h(srcinfo, dstinfo, src_coef_arrays);
+      break;
+    case JXFORM_FLIP_V:
+      do_flip_v(srcinfo, dstinfo, src_coef_arrays, dst_coef_arrays);
+      break;
+    case JXFORM_TRANSPOSE:
+      do_transpose(srcinfo, dstinfo, src_coef_arrays, dst_coef_arrays);
+      break;
+    case JXFORM_TRANSVERSE:
+      do_transverse(srcinfo, dstinfo, src_coef_arrays, dst_coef_arrays);
+      break;
+    case JXFORM_ROT_90:
+      do_rot_90(srcinfo, dstinfo, src_coef_arrays, dst_coef_arrays);
+      break;
+    case JXFORM_ROT_180:
+      do_rot_180(srcinfo, dstinfo, src_coef_arrays, dst_coef_arrays);
+      break;
+    case JXFORM_ROT_270:
+      do_rot_270(srcinfo, dstinfo, src_coef_arrays, dst_coef_arrays);
+      break;
   }
 }
 
@@ -901,9 +873,7 @@ jtransform_execute_transformation (j_decompress_ptr srcinfo,
  * This must be called before jpeg_read_header() to have the desired effect.
  */
 
-void
-jcopy_markers_setup (j_decompress_ptr srcinfo, JCOPY_OPTION option)
-{
+void jcopy_markers_setup(j_decompress_ptr srcinfo, JCOPY_OPTION option) {
 #ifdef SAVE_MARKERS_SUPPORTED
   int m;
 
@@ -913,8 +883,7 @@ jcopy_markers_setup (j_decompress_ptr srcinfo, JCOPY_OPTION option)
   }
   /* Save all types of APPn markers iff ALL option */
   if (option == JCOPYOPT_ALL) {
-    for (m = 0; m < 16; m++)
-      jpeg_save_markers(srcinfo, JPEG_APP0 + m, 0xFFFF);
+    for (m = 0; m < 16; m++) jpeg_save_markers(srcinfo, JPEG_APP0 + m, 0xFFFF);
   }
 #endif /* SAVE_MARKERS_SUPPORTED */
 }
@@ -926,10 +895,8 @@ jcopy_markers_setup (j_decompress_ptr srcinfo, JCOPY_OPTION option)
  * JFIF APP0 or Adobe APP14 markers if selected.
  */
 
-void
-jcopy_markers_execute (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
-		       JCOPY_OPTION option)
-{
+void jcopy_markers_execute(j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
+                           JCOPY_OPTION option) {
   jpeg_saved_marker_ptr marker;
 
   /* In the current implementation, we don't actually need to examine the
@@ -938,24 +905,19 @@ jcopy_markers_execute (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
    * if the encoder library already wrote one.
    */
   for (marker = srcinfo->marker_list; marker != NULL; marker = marker->next) {
-    if (dstinfo->write_JFIF_header &&
-	marker->marker == JPEG_APP0 &&
-	marker->data_length >= 5 &&
-	GETJOCTET(marker->data[0]) == 0x4A &&
-	GETJOCTET(marker->data[1]) == 0x46 &&
-	GETJOCTET(marker->data[2]) == 0x49 &&
-	GETJOCTET(marker->data[3]) == 0x46 &&
-	GETJOCTET(marker->data[4]) == 0)
-      continue;			/* reject duplicate JFIF */
-    if (dstinfo->write_Adobe_marker &&
-	marker->marker == JPEG_APP0+14 &&
-	marker->data_length >= 5 &&
-	GETJOCTET(marker->data[0]) == 0x41 &&
-	GETJOCTET(marker->data[1]) == 0x64 &&
-	GETJOCTET(marker->data[2]) == 0x6F &&
-	GETJOCTET(marker->data[3]) == 0x62 &&
-	GETJOCTET(marker->data[4]) == 0x65)
-      continue;			/* reject duplicate Adobe */
+    if (dstinfo->write_JFIF_header && marker->marker == JPEG_APP0 &&
+        marker->data_length >= 5 && GETJOCTET(marker->data[0]) == 0x4A &&
+        GETJOCTET(marker->data[1]) == 0x46 &&
+        GETJOCTET(marker->data[2]) == 0x49 &&
+        GETJOCTET(marker->data[3]) == 0x46 && GETJOCTET(marker->data[4]) == 0)
+      continue; /* reject duplicate JFIF */
+    if (dstinfo->write_Adobe_marker && marker->marker == JPEG_APP0 + 14 &&
+        marker->data_length >= 5 && GETJOCTET(marker->data[0]) == 0x41 &&
+        GETJOCTET(marker->data[1]) == 0x64 &&
+        GETJOCTET(marker->data[2]) == 0x6F &&
+        GETJOCTET(marker->data[3]) == 0x62 &&
+        GETJOCTET(marker->data[4]) == 0x65)
+      continue; /* reject duplicate Adobe */
 
 #ifdef NEED_FAR_POINTERS
     /* We could use jpeg_write_marker if the data weren't FAR... */
@@ -963,11 +925,11 @@ jcopy_markers_execute (j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
       unsigned int i;
       jpeg_write_m_header(dstinfo, marker->marker, marker->data_length);
       for (i = 0; i < marker->data_length; i++)
-	jpeg_write_m_byte(dstinfo, marker->data[i]);
+        jpeg_write_m_byte(dstinfo, marker->data[i]);
     }
 #else
-    jpeg_write_marker(dstinfo, marker->marker,
-		      marker->data, marker->data_length);
+    jpeg_write_marker(dstinfo, marker->marker, marker->data,
+                      marker->data_length);
 #endif
   }
 }

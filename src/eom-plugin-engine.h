@@ -34,26 +34,33 @@ typedef struct _EomPluginEngine EomPluginEngine;
 typedef struct _EomPluginEngineClass EomPluginEngineClass;
 typedef struct _EomPluginEnginePrivate EomPluginEnginePrivate;
 
-#define EOM_TYPE_PLUGIN_ENGINE            eom_plugin_engine_get_type()
-#define EOM_PLUGIN_ENGINE(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), EOM_TYPE_PLUGIN_ENGINE, EomPluginEngine))
-#define EOM_PLUGIN_ENGINE_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), EOM_TYPE_PLUGIN_ENGINE, EomPluginEngineClass))
-#define EOM_IS_PLUGIN_ENGINE(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), EOM_TYPE_PLUGIN_ENGINE))
-#define EOM_IS_PLUGIN_ENGINE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), EOM_TYPE_PLUGIN_ENGINE))
-#define EOM_PLUGIN_ENGINE_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), EOM_TYPE_PLUGIN_ENGINE, EomPluginEngineClass))
+#define EOM_TYPE_PLUGIN_ENGINE eom_plugin_engine_get_type()
+#define EOM_PLUGIN_ENGINE(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj), EOM_TYPE_PLUGIN_ENGINE, EomPluginEngine))
+#define EOM_PLUGIN_ENGINE_CLASS(klass)                      \
+  (G_TYPE_CHECK_CLASS_CAST((klass), EOM_TYPE_PLUGIN_ENGINE, \
+                           EomPluginEngineClass))
+#define EOM_IS_PLUGIN_ENGINE(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE((obj), EOM_TYPE_PLUGIN_ENGINE))
+#define EOM_IS_PLUGIN_ENGINE_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE((klass), EOM_TYPE_PLUGIN_ENGINE))
+#define EOM_PLUGIN_ENGINE_GET_CLASS(obj)                    \
+  (G_TYPE_INSTANCE_GET_CLASS((obj), EOM_TYPE_PLUGIN_ENGINE, \
+                             EomPluginEngineClass))
 
 struct _EomPluginEngine {
-	PeasEngine parent;
-	EomPluginEnginePrivate *priv;
+  PeasEngine parent;
+  EomPluginEnginePrivate* priv;
 };
 
 struct _EomPluginEngineClass {
-	PeasEngineClass parent_class;
+  PeasEngineClass parent_class;
 };
 
-GType eom_plugin_engine_get_type (void) G_GNUC_CONST;
+GType eom_plugin_engine_get_type(void) G_GNUC_CONST;
 
-EomPluginEngine* eom_plugin_engine_new (void);
+EomPluginEngine* eom_plugin_engine_new(void);
 
 G_END_DECLS
 
-#endif  /* __EOM_PLUGIN_ENGINE_H__ */
+#endif /* __EOM_PLUGIN_ENGINE_H__ */

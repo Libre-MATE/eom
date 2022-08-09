@@ -23,15 +23,14 @@
 #define __EOM_ENUMS__
 
 typedef enum {
-	EOM_IMAGE_DATA_IMAGE     = 1 << 0,
-	EOM_IMAGE_DATA_DIMENSION = 1 << 1,
-	EOM_IMAGE_DATA_EXIF      = 1 << 2,
-	EOM_IMAGE_DATA_XMP       = 1 << 3
+  EOM_IMAGE_DATA_IMAGE = 1 << 0,
+  EOM_IMAGE_DATA_DIMENSION = 1 << 1,
+  EOM_IMAGE_DATA_EXIF = 1 << 2,
+  EOM_IMAGE_DATA_XMP = 1 << 3
 } EomImageData;
 
-#define EOM_IMAGE_DATA_ALL  (EOM_IMAGE_DATA_IMAGE |     \
-			     EOM_IMAGE_DATA_DIMENSION | \
-			     EOM_IMAGE_DATA_EXIF |      \
-			     EOM_IMAGE_DATA_XMP)
+#define EOM_IMAGE_DATA_ALL                                                 \
+  (EOM_IMAGE_DATA_IMAGE | EOM_IMAGE_DATA_DIMENSION | EOM_IMAGE_DATA_EXIF | \
+   EOM_IMAGE_DATA_XMP)
 
 #endif

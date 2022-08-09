@@ -20,41 +20,41 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ * USA.
  */
 
 #ifndef __EOM_APPLICATION_INTERNAL_H__
 #define __EOM_APPLICATION_INTERNAL_H__
 
-#include <glib.h>
 #include <glib-object.h>
-
+#include <glib.h>
 #include <libpeas/peas-extension-set.h>
 
+#include "egg-toolbars-model.h"
 #include "eom-application.h"
 #include "eom-plugin-engine.h"
-#include "egg-toolbars-model.h"
 #include "eom-window.h"
 
 G_BEGIN_DECLS
 
 struct _EomApplicationPrivate {
-	EggToolbarsModel *toolbars_model;
-	gchar            *toolbars_file;
-	EomPluginEngine  *plugin_engine;
+  EggToolbarsModel *toolbars_model;
+  gchar *toolbars_file;
+  EomPluginEngine *plugin_engine;
 
-	EomStartupFlags   flags;
+  EomStartupFlags flags;
 
-	PeasExtensionSet *extensions;
+  PeasExtensionSet *extensions;
 };
 
-EggToolbarsModel *eom_application_get_toolbars_model  (EomApplication *application);
+EggToolbarsModel *eom_application_get_toolbars_model(
+    EomApplication *application);
 
-void              eom_application_save_toolbars_model (EomApplication *application);
+void eom_application_save_toolbars_model(EomApplication *application);
 
-void              eom_application_reset_toolbars_model (EomApplication *app);
+void eom_application_reset_toolbars_model(EomApplication *app);
 
 G_END_DECLS
 
 #endif /* __EOM_APPLICATION_INTERNAL_H__ */
-

@@ -17,7 +17,8 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ * USA.
  */
 
 /* based upon file transupp.h from the libjpeg package, original copyright
@@ -53,14 +54,14 @@
 #include <jpeglib.h>
 
 typedef enum {
-	JXFORM_NONE,		/* no transformation */
-	JXFORM_FLIP_H,		/* horizontal flip */
-	JXFORM_FLIP_V,		/* vertical flip */
-	JXFORM_TRANSPOSE,	/* transpose across UL-to-LR axis */
-	JXFORM_TRANSVERSE,	/* transpose across UR-to-LL axis */
-	JXFORM_ROT_90,		/* 90-degree clockwise rotation */
-	JXFORM_ROT_180,		/* 180-degree rotation */
-	JXFORM_ROT_270		/* 270-degree clockwise (or 90 ccw) */
+  JXFORM_NONE,       /* no transformation */
+  JXFORM_FLIP_H,     /* horizontal flip */
+  JXFORM_FLIP_V,     /* vertical flip */
+  JXFORM_TRANSPOSE,  /* transpose across UL-to-LR axis */
+  JXFORM_TRANSVERSE, /* transpose across UR-to-LL axis */
+  JXFORM_ROT_90,     /* 90-degree clockwise rotation */
+  JXFORM_ROT_180,    /* 180-degree rotation */
+  JXFORM_ROT_270     /* 270-degree clockwise (or 90 ccw) */
 } JXFORM_CODE;
 
 /*
@@ -100,52 +101,49 @@ typedef enum {
 
 typedef struct {
   /* Options: set by caller */
-  JXFORM_CODE transform;	/* image transform operator */
-  boolean trim;			/* if TRUE, trim partial MCUs as needed */
-  boolean force_grayscale;	/* if TRUE, convert color image to grayscale */
+  JXFORM_CODE transform;   /* image transform operator */
+  boolean trim;            /* if TRUE, trim partial MCUs as needed */
+  boolean force_grayscale; /* if TRUE, convert color image to grayscale */
 
   /* Internal workspace: caller should not touch these */
-  int num_components;		/* # of components in workspace */
-  jvirt_barray_ptr * workspace_coef_arrays; /* workspace for transformations */
+  int num_components;                      /* # of components in workspace */
+  jvirt_barray_ptr *workspace_coef_arrays; /* workspace for transformations */
 } jpeg_transform_info;
 
 /* Request any required workspace */
-void jtransform_request_workspace   (j_decompress_ptr     srcinfo,
-				     jpeg_transform_info *info);
+void jtransform_request_workspace(j_decompress_ptr srcinfo,
+                                  jpeg_transform_info *info);
 
 /* Adjust output image parameters */
 
-jvirt_barray_ptr * jtransform_adjust_parameters (j_decompress_ptr     srcinfo,
-						 j_compress_ptr       dstinfo,
-						 jvirt_barray_ptr    *src_coef_arrays,
-						 jpeg_transform_info *info);
+jvirt_barray_ptr *jtransform_adjust_parameters(
+    j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
+    jvirt_barray_ptr *src_coef_arrays, jpeg_transform_info *info);
 
 /* Execute the actual transformation, if any */
-void jtransform_execute_transformation (j_decompress_ptr     srcinfo,
-					j_compress_ptr       dstinfo,
-					jvirt_barray_ptr    *src_coef_arrays,
-					jpeg_transform_info *info);
+void jtransform_execute_transformation(j_decompress_ptr srcinfo,
+                                       j_compress_ptr dstinfo,
+                                       jvirt_barray_ptr *src_coef_arrays,
+                                       jpeg_transform_info *info);
 
 /*
  * Support for copying optional markers from source to destination file.
  */
 
 typedef enum {
-	JCOPYOPT_NONE,		/* copy no optional markers */
-	JCOPYOPT_COMMENTS,	/* copy only comment (COM) markers */
-	JCOPYOPT_ALL		/* copy all optional markers */
+  JCOPYOPT_NONE,     /* copy no optional markers */
+  JCOPYOPT_COMMENTS, /* copy only comment (COM) markers */
+  JCOPYOPT_ALL       /* copy all optional markers */
 } JCOPY_OPTION;
 
-#define JCOPYOPT_DEFAULT  JCOPYOPT_COMMENTS	/* recommended default */
+#define JCOPYOPT_DEFAULT JCOPYOPT_COMMENTS /* recommended default */
 
 /* Setup decompression object to save desired markers in memory */
-void jcopy_markers_setup (j_decompress_ptr srcinfo,
-			  JCOPY_OPTION     option);
+void jcopy_markers_setup(j_decompress_ptr srcinfo, JCOPY_OPTION option);
 
 /* Copy markers saved in the given source object to the destination object */
-void jcopy_markers_execute (j_decompress_ptr srcinfo,
-			    j_compress_ptr   dstinfo,
-			    JCOPY_OPTION     option);
+void jcopy_markers_execute(j_decompress_ptr srcinfo, j_compress_ptr dstinfo,
+                           JCOPY_OPTION option);
 
 #endif /* TRANSUPP_H */
 

@@ -30,43 +30,40 @@
 G_BEGIN_DECLS
 
 G_GNUC_INTERNAL
-void     eom_util_show_help                  (const gchar *section,
-					      GtkWindow   *parent);
+void eom_util_show_help(const gchar *section, GtkWindow *parent);
 
 G_GNUC_INTERNAL
-gchar   *eom_util_make_valid_utf8            (const gchar *name);
+gchar *eom_util_make_valid_utf8(const gchar *name);
 
 G_GNUC_INTERNAL
-GSList  *eom_util_parse_uri_string_list_to_file_list (const gchar *uri_list);
+GSList *eom_util_parse_uri_string_list_to_file_list(const gchar *uri_list);
 
 G_GNUC_INTERNAL
-GSList  *eom_util_string_list_to_file_list    (GSList *string_list);
+GSList *eom_util_string_list_to_file_list(GSList *string_list);
 
 G_GNUC_INTERNAL
-GSList  *eom_util_strings_to_file_list        (gchar **strings);
+GSList *eom_util_strings_to_file_list(gchar **strings);
 
 G_GNUC_INTERNAL
-GSList  *eom_util_string_array_to_list       (const gchar **files,
-	 				      gboolean create_uri);
+GSList *eom_util_string_array_to_list(const gchar **files, gboolean create_uri);
 
 G_GNUC_INTERNAL
-gchar  **eom_util_string_array_make_absolute (gchar **files);
+gchar **eom_util_string_array_make_absolute(gchar **files);
 
 G_GNUC_INTERNAL
-const    gchar *eom_util_dot_dir             (void);
+const gchar *eom_util_dot_dir(void);
 
 G_GNUC_INTERNAL
-char *  eom_util_filename_get_extension      (const char * filename_with_extension);
+char *eom_util_filename_get_extension(const char *filename_with_extension);
 
 G_GNUC_INTERNAL
-gboolean eom_util_file_is_persistent (GFile *file);
+gboolean eom_util_file_is_persistent(GFile *file);
 
 G_GNUC_INTERNAL
-void     eom_util_show_file_in_filemanager   (GFile *file,
-                                              GtkWindow *toplevel);
+void eom_util_show_file_in_filemanager(GFile *file, GtkWindow *toplevel);
 
-gboolean eom_notebook_scroll_event_cb        (GtkWidget      *notebook,
-                                              GdkEventScroll *event);
+gboolean eom_notebook_scroll_event_cb(GtkWidget *notebook,
+                                      GdkEventScroll *event);
 
 G_END_DECLS
 

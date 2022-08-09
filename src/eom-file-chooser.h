@@ -18,40 +18,43 @@
 #ifndef _EOM_FILE_CHOOSER_H_
 #define _EOM_FILE_CHOOSER_H_
 
-#include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
+#include <gtk/gtk.h>
 
 G_BEGIN_DECLS
 
-#define EOM_TYPE_FILE_CHOOSER          (eom_file_chooser_get_type ())
-#define EOM_FILE_CHOOSER(o)            (G_TYPE_CHECK_INSTANCE_CAST ((o), EOM_TYPE_FILE_CHOOSER, EomFileChooser))
-#define EOM_FILE_CHOOSER_CLASS(k)      (G_TYPE_CHECK_CLASS_CAST((k), EOM_TYPE_FILE_CHOOSER, EomFileChooserClass))
+#define EOM_TYPE_FILE_CHOOSER (eom_file_chooser_get_type())
+#define EOM_FILE_CHOOSER(o) \
+  (G_TYPE_CHECK_INSTANCE_CAST((o), EOM_TYPE_FILE_CHOOSER, EomFileChooser))
+#define EOM_FILE_CHOOSER_CLASS(k) \
+  (G_TYPE_CHECK_CLASS_CAST((k), EOM_TYPE_FILE_CHOOSER, EomFileChooserClass))
 
-#define EOM_IS_FILE_CHOOSER(o)         (G_TYPE_CHECK_INSTANCE_TYPE ((o), EOM_TYPE_FILE_CHOOSER))
-#define EOM_IS_FILE_CHOOSER_CLASS(k)   (G_TYPE_CHECK_CLASS_TYPE ((k), EOM_TYPE_FILE_CHOOSER))
-#define EOM_FILE_CHOOSER_GET_CLASS(o)  (G_TYPE_INSTANCE_GET_CLASS ((o), EOM_TYPE_FILE_CHOOSER, EomFileChooserClass))
+#define EOM_IS_FILE_CHOOSER(o) \
+  (G_TYPE_CHECK_INSTANCE_TYPE((o), EOM_TYPE_FILE_CHOOSER))
+#define EOM_IS_FILE_CHOOSER_CLASS(k) \
+  (G_TYPE_CHECK_CLASS_TYPE((k), EOM_TYPE_FILE_CHOOSER))
+#define EOM_FILE_CHOOSER_GET_CLASS(o) \
+  (G_TYPE_INSTANCE_GET_CLASS((o), EOM_TYPE_FILE_CHOOSER, EomFileChooserClass))
 
-typedef struct _EomFileChooser         EomFileChooser;
-typedef struct _EomFileChooserClass    EomFileChooserClass;
-typedef struct _EomFileChooserPrivate  EomFileChooserPrivate;
+typedef struct _EomFileChooser EomFileChooser;
+typedef struct _EomFileChooserClass EomFileChooserClass;
+typedef struct _EomFileChooserPrivate EomFileChooserPrivate;
 
-struct _EomFileChooser
-{
-	GtkFileChooserDialog  parent;
+struct _EomFileChooser {
+  GtkFileChooserDialog parent;
 
-	EomFileChooserPrivate *priv;
+  EomFileChooserPrivate *priv;
 };
 
-struct _EomFileChooserClass
-{
-	GtkFileChooserDialogClass  parent_class;
+struct _EomFileChooserClass {
+  GtkFileChooserDialogClass parent_class;
 };
 
-GType		 eom_file_chooser_get_type	(void) G_GNUC_CONST;
+GType eom_file_chooser_get_type(void) G_GNUC_CONST;
 
-GtkWidget	*eom_file_chooser_new		(GtkFileChooserAction action);
+GtkWidget *eom_file_chooser_new(GtkFileChooserAction action);
 
-GdkPixbufFormat	*eom_file_chooser_get_format	(EomFileChooser *chooser);
+GdkPixbufFormat *eom_file_chooser_get_format(EomFileChooser *chooser);
 
 G_END_DECLS
 

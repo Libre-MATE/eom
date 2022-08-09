@@ -22,12 +22,12 @@
 #ifndef __EOM_PROPERTIES_DIALOG_H__
 #define __EOM_PROPERTIES_DIALOG_H__
 
+#include <glib-object.h>
+#include <glib.h>
+#include <gtk/gtk.h>
+
 #include "eom-image.h"
 #include "eom-thumb-view.h"
-
-#include <glib.h>
-#include <glib-object.h>
-#include <gtk/gtk.h>
 
 G_BEGIN_DECLS
 
@@ -35,45 +35,51 @@ typedef struct _EomPropertiesDialog EomPropertiesDialog;
 typedef struct _EomPropertiesDialogClass EomPropertiesDialogClass;
 typedef struct _EomPropertiesDialogPrivate EomPropertiesDialogPrivate;
 
-#define EOM_TYPE_PROPERTIES_DIALOG            (eom_properties_dialog_get_type ())
-#define EOM_PROPERTIES_DIALOG(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), EOM_TYPE_PROPERTIES_DIALOG, EomPropertiesDialog))
-#define EOM_PROPERTIES_DIALOG_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass),  EOM_TYPE_PROPERTIES_DIALOG, EomPropertiesDialogClass))
-#define EOM_IS_PROPERTIES_DIALOG(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), EOM_TYPE_PROPERTIES_DIALOG))
-#define EOM_IS_PROPERTIES_DIALOG_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass),  EOM_TYPE_PROPERTIES_DIALOG))
-#define EOM_PROPERTIES_DIALOG_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj),  EOM_TYPE_PROPERTIES_DIALOG, EomPropertiesDialogClass))
+#define EOM_TYPE_PROPERTIES_DIALOG (eom_properties_dialog_get_type())
+#define EOM_PROPERTIES_DIALOG(obj)                               \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj), EOM_TYPE_PROPERTIES_DIALOG, \
+                              EomPropertiesDialog))
+#define EOM_PROPERTIES_DIALOG_CLASS(klass)                      \
+  (G_TYPE_CHECK_CLASS_CAST((klass), EOM_TYPE_PROPERTIES_DIALOG, \
+                           EomPropertiesDialogClass))
+#define EOM_IS_PROPERTIES_DIALOG(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE((obj), EOM_TYPE_PROPERTIES_DIALOG))
+#define EOM_IS_PROPERTIES_DIALOG_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE((klass), EOM_TYPE_PROPERTIES_DIALOG))
+#define EOM_PROPERTIES_DIALOG_GET_CLASS(obj)                    \
+  (G_TYPE_INSTANCE_GET_CLASS((obj), EOM_TYPE_PROPERTIES_DIALOG, \
+                             EomPropertiesDialogClass))
 
 typedef enum {
-	EOM_PROPERTIES_DIALOG_PAGE_GENERAL = 0,
-	EOM_PROPERTIES_DIALOG_PAGE_EXIF,
-	EOM_PROPERTIES_DIALOG_PAGE_DETAILS,
-	EOM_PROPERTIES_DIALOG_N_PAGES
+  EOM_PROPERTIES_DIALOG_PAGE_GENERAL = 0,
+  EOM_PROPERTIES_DIALOG_PAGE_EXIF,
+  EOM_PROPERTIES_DIALOG_PAGE_DETAILS,
+  EOM_PROPERTIES_DIALOG_N_PAGES
 } EomPropertiesDialogPage;
 
 struct _EomPropertiesDialog {
-	GtkDialog dialog;
+  GtkDialog dialog;
 
-	EomPropertiesDialogPrivate *priv;
+  EomPropertiesDialogPrivate *priv;
 };
 
 struct _EomPropertiesDialogClass {
-	GtkDialogClass parent_class;
+  GtkDialogClass parent_class;
 };
 
-GType	    eom_properties_dialog_get_type	(void) G_GNUC_CONST;
+GType eom_properties_dialog_get_type(void) G_GNUC_CONST;
 
-GtkWidget   *eom_properties_dialog_new	  	(GtkWindow               *parent,
-                                             EomThumbView            *thumbview,
-                                             GtkAction               *next_image_action,
-                                             GtkAction               *previous_image_action);
+GtkWidget *eom_properties_dialog_new(GtkWindow *parent, EomThumbView *thumbview,
+                                     GtkAction *next_image_action,
+                                     GtkAction *previous_image_action);
 
-void	    eom_properties_dialog_update  	(EomPropertiesDialog     *prop,
-						 EomImage                *image);
+void eom_properties_dialog_update(EomPropertiesDialog *prop, EomImage *image);
 
-void	    eom_properties_dialog_set_page  	(EomPropertiesDialog     *prop,
-						 EomPropertiesDialogPage  page);
+void eom_properties_dialog_set_page(EomPropertiesDialog *prop,
+                                    EomPropertiesDialogPage page);
 
-void	    eom_properties_dialog_set_netbook_mode (EomPropertiesDialog *dlg,
-						    gboolean enable);
+void eom_properties_dialog_set_netbook_mode(EomPropertiesDialog *dlg,
+                                            gboolean enable);
 G_END_DECLS
 
 #endif /* __EOM_PROPERTIES_DIALOG_H__ */

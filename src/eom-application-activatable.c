@@ -26,62 +26,57 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
-#include "eom-application-activatable.h"
-
 #include <glib-object.h>
+
+#include "eom-application-activatable.h"
 #include "eom-application.h"
 
-G_DEFINE_INTERFACE(EomApplicationActivatable, eom_application_activatable, G_TYPE_OBJECT)
+G_DEFINE_INTERFACE(EomApplicationActivatable, eom_application_activatable,
+                   G_TYPE_OBJECT)
 
-void
-eom_application_activatable_default_init (EomApplicationActivatableInterface *iface)
-{
-	static gboolean initialized = FALSE;
+void eom_application_activatable_default_init(
+    EomApplicationActivatableInterface *iface) {
+  static gboolean initialized = FALSE;
 
-	if (!initialized) {
-		/**
-         * EomApplicationActivatable:app:
-		 *
-         * This is the #EomApplication this #EomApplicationActivatable instance
-		 * should be attached to.
-		 */
-		g_object_interface_install_property (iface,
-                g_param_spec_object ("app", "Application",
-                             "The EomApplication this instance it attached to",
-                             EOM_TYPE_APPLICATION,
-						     G_PARAM_READWRITE |
-						     G_PARAM_CONSTRUCT_ONLY |
-						     G_PARAM_STATIC_STRINGS));
-		initialized = TRUE;
-	}
+  if (!initialized) {
+    /**
+     * EomApplicationActivatable:app:
+     *
+     * This is the #EomApplication this #EomApplicationActivatable instance
+     * should be attached to.
+     */
+    g_object_interface_install_property(
+        iface,
+        g_param_spec_object("app", "Application",
+                            "The EomApplication this instance it attached to",
+                            EOM_TYPE_APPLICATION,
+                            G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
+                                G_PARAM_STATIC_STRINGS));
+    initialized = TRUE;
+  }
 }
 
-void
-eom_application_activatable_activate (EomApplicationActivatable *activatable)
-{
-    EomApplicationActivatableInterface *iface;
+void eom_application_activatable_activate(
+    EomApplicationActivatable *activatable) {
+  EomApplicationActivatableInterface *iface;
 
-    g_return_if_fail (EOM_IS_APPLICATION_ACTIVATABLE (activatable));
+  g_return_if_fail(EOM_IS_APPLICATION_ACTIVATABLE(activatable));
 
-    iface = EOM_APPLICATION_ACTIVATABLE_GET_IFACE (activatable);
+  iface = EOM_APPLICATION_ACTIVATABLE_GET_IFACE(activatable);
 
-	if (G_LIKELY (iface->activate != NULL))
-		iface->activate (activatable);
+  if (G_LIKELY(iface->activate != NULL)) iface->activate(activatable);
 }
 
-void
-eom_application_activatable_deactivate (EomApplicationActivatable *activatable)
-{
-    EomApplicationActivatableInterface *iface;
+void eom_application_activatable_deactivate(
+    EomApplicationActivatable *activatable) {
+  EomApplicationActivatableInterface *iface;
 
-    g_return_if_fail (EOM_IS_APPLICATION_ACTIVATABLE (activatable));
+  g_return_if_fail(EOM_IS_APPLICATION_ACTIVATABLE(activatable));
 
-    iface = EOM_APPLICATION_ACTIVATABLE_GET_IFACE (activatable);
+  iface = EOM_APPLICATION_ACTIVATABLE_GET_IFACE(activatable);
 
-	if (G_LIKELY (iface->deactivate != NULL))
-		iface->deactivate (activatable);
+  if (G_LIKELY(iface->deactivate != NULL)) iface->deactivate(activatable);
 }
-

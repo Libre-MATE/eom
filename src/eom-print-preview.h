@@ -22,62 +22,64 @@
 #ifndef _EOM_PRINT_PREVIEW_H_
 #define _EOM_PRINT_PREVIEW_H_
 
+#include <glib.h>
+#include <gtk/gtk.h>
+
 G_BEGIN_DECLS
 
 typedef struct _EomPrintPreview EomPrintPreview;
 typedef struct _EomPrintPreviewClass EomPrintPreviewClass;
 typedef struct _EomPrintPreviewPrivate EomPrintPreviewPrivate;
 
-#define EOM_TYPE_PRINT_PREVIEW            (eom_print_preview_get_type ())
-#define EOM_PRINT_PREVIEW(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), EOM_TYPE_PRINT_PREVIEW, EomPrintPreview))
-#define EOM_PRINT_PREVIEW_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), EOM_TYPE_PRINT_PREVIEW, EomPrintPreviewClass))
-#define EOM_IS_PRINT_PREVIEW(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), EOM_TYPE_PRINT_PREVIEW))
-#define EOM_IS_PRINT_PREVIEW_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), EOM_TYPE_PRINT_PREVIEW))
+#define EOM_TYPE_PRINT_PREVIEW (eom_print_preview_get_type())
+#define EOM_PRINT_PREVIEW(obj) \
+  (G_TYPE_CHECK_INSTANCE_CAST((obj), EOM_TYPE_PRINT_PREVIEW, EomPrintPreview))
+#define EOM_PRINT_PREVIEW_CLASS(klass)                      \
+  (G_TYPE_CHECK_CLASS_CAST((klass), EOM_TYPE_PRINT_PREVIEW, \
+                           EomPrintPreviewClass))
+#define EOM_IS_PRINT_PREVIEW(obj) \
+  (G_TYPE_CHECK_INSTANCE_TYPE((obj), EOM_TYPE_PRINT_PREVIEW))
+#define EOM_IS_PRINT_PREVIEW_CLASS(klass) \
+  (G_TYPE_CHECK_CLASS_TYPE((klass), EOM_TYPE_PRINT_PREVIEW))
 
 struct _EomPrintPreview {
-	GtkAspectFrame aspect_frame;
+  GtkAspectFrame aspect_frame;
 
-	EomPrintPreviewPrivate *priv;
+  EomPrintPreviewPrivate *priv;
 };
 
 struct _EomPrintPreviewClass {
-	GtkAspectFrameClass parent_class;
-
+  GtkAspectFrameClass parent_class;
 };
 
 G_GNUC_INTERNAL
-GType        eom_print_preview_get_type            (void) G_GNUC_CONST;
+GType eom_print_preview_get_type(void) G_GNUC_CONST;
 
 G_GNUC_INTERNAL
-GtkWidget   *eom_print_preview_new                 (void);
+GtkWidget *eom_print_preview_new(void);
 
 G_GNUC_INTERNAL
-GtkWidget   *eom_print_preview_new_with_pixbuf     (GdkPixbuf       *pixbuf);
+GtkWidget *eom_print_preview_new_with_pixbuf(GdkPixbuf *pixbuf);
 
 G_GNUC_INTERNAL
-void         eom_print_preview_set_page_margins    (EomPrintPreview *preview,
-						    gfloat          l_margin,
-						    gfloat          r_margin,
-						    gfloat          t_margin,
-						    gfloat          b_margin);
+void eom_print_preview_set_page_margins(EomPrintPreview *preview,
+                                        gfloat l_margin, gfloat r_margin,
+                                        gfloat t_margin, gfloat b_margin);
 
 G_GNUC_INTERNAL
-void         eom_print_preview_set_from_page_setup (EomPrintPreview *preview,
-						    GtkPageSetup    *setup);
+void eom_print_preview_set_from_page_setup(EomPrintPreview *preview,
+                                           GtkPageSetup *setup);
 
 G_GNUC_INTERNAL
-void         eom_print_preview_get_image_position  (EomPrintPreview *preview,
-						    gdouble         *x,
-						    gdouble         *y);
+void eom_print_preview_get_image_position(EomPrintPreview *preview, gdouble *x,
+                                          gdouble *y);
 
 G_GNUC_INTERNAL
-void         eom_print_preview_set_image_position  (EomPrintPreview *preview,
-						    gdouble          x,
-						    gdouble          y);
+void eom_print_preview_set_image_position(EomPrintPreview *preview, gdouble x,
+                                          gdouble y);
 
 G_GNUC_INTERNAL
-void         eom_print_preview_set_scale           (EomPrintPreview *preview,
-						    gfloat           scale);
+void eom_print_preview_set_scale(EomPrintPreview *preview, gfloat scale);
 
 G_END_DECLS
 

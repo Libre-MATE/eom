@@ -22,27 +22,28 @@
 #ifndef __EOM_PRINT_H__
 #define __EOM_PRINT_H__
 
-#include "eom-image.h"
 #include <gtk/gtk.h>
+
+#include "eom-image.h"
 
 G_BEGIN_DECLS
 
 G_GNUC_INTERNAL
-GtkPrintOperation*    eom_print_operation_new (EomImage *image,
-					       GtkPrintSettings *print_settings,
-					       GtkPageSetup *page_setup);
+GtkPrintOperation *eom_print_operation_new(EomImage *image,
+                                           GtkPrintSettings *print_settings,
+                                           GtkPageSetup *page_setup);
 
 G_GNUC_INTERNAL
-GtkPageSetup*         eom_print_get_page_setup (void);
+GtkPageSetup *eom_print_get_page_setup(void);
 
 G_GNUC_INTERNAL
-void                  eom_print_set_page_setup (GtkPageSetup *page_setup);
+void eom_print_set_page_setup(GtkPageSetup *page_setup);
 
 G_GNUC_INTERNAL
-GtkPrintSettings *    eom_print_get_print_settings (void);
+GtkPrintSettings *eom_print_get_print_settings(void);
 
 G_GNUC_INTERNAL
-void                  eom_print_set_print_settings (GtkPrintSettings *print_settings);
+void eom_print_set_print_settings(GtkPrintSettings *print_settings);
 
 G_END_DECLS
 
