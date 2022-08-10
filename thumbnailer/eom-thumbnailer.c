@@ -152,9 +152,9 @@ int main(int argc, char **argv) {
   /* Thumbnail */
   if ((height > output_size) || (width > output_size)) {
     double scale;
-    scale = (double)output_size / MAX(width, height);
-    MagickThumbnailImage(magick_wand, (size_t)floor(width * scale + 0.5),
-                         (size_t)floor(height * scale + 0.5));
+    scale = ((double) output_size) / ((double) MAX(width, height));
+    MagickThumbnailImage(magick_wand, (size_t)(scale * (double) width),
+                         (size_t)(scale * (double) height));
   }
 
   /* Write the image then destroy it */
