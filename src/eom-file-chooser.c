@@ -258,20 +258,6 @@ static void set_preview_pixbuf(EomFileChooser *chooser, GdkPixbuf *pixbuf,
       dim_str = g_strdup_printf("%s x %s %s", width, height,
                                 ngettext("pixel", "pixels", pixels));
     }
-
-#if 0
-		/* Not sure, if this is really useful, therefore its commented out for now. */
-
-		/* try to read creator of the thumbnail */
-		creator = gdk_pixbuf_get_option (pixbuf, "tEXt::Software");
-
-		/* stupid workaround to display nicer string if the
-		 * thumbnail is created through the mate libraries.
-		 */
-		if (g_ascii_strcasecmp (creator, "Mate::ThumbnailFactory") == 0) {
-			creator = "MATE Libs";
-		}
-#endif
   }
 
   set_preview_label(priv->size_label, size_str);

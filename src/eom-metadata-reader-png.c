@@ -52,10 +52,6 @@ typedef enum {
   EMR_FINISHED
 } EomMetadataReaderPngState;
 
-#if 0
-#define IS_FINISHED(priv) (priv->icc_chunk != NULL && priv->xmp_chunk != NULL)
-#endif
-
 struct _EomMetadataReaderPngPrivate {
   EomMetadataReaderPngState state;
 

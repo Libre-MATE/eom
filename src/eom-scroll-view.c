@@ -689,9 +689,6 @@ static void set_zoom(EomScrollView *view, double zoom, gboolean have_anchor,
   /* set new values */
   priv->xofs = xofs; /* (img_width * x_rel * zoom) - anchorx; */
   priv->yofs = yofs; /* (img_height * y_rel * zoom) - anchory; */
-#if 0
-	g_print ("xofs: %i  yofs: %i\n", priv->xofs, priv->yofs);
-#endif
   if (zoom <= priv->min_zoom)
     priv->zoom = priv->min_zoom;
   else

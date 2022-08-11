@@ -55,12 +55,6 @@ struct _EomImagePrivate {
   guint exif_chunk_len;
   guchar *exif_chunk;
 
-#if 0
-	/* Holds IPTC raw data */
-	guchar           *iptc_chunk;
-	guint             iptc_chunk_len;
-#endif
-
   gboolean modified;
   gboolean file_is_changed;
 

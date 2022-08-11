@@ -66,9 +66,6 @@ EomTransform *eom_transform_identity_new(void);
 EomTransform *eom_transform_rotate_new(int degree);
 EomTransform *eom_transform_flip_new(
     EomTransformType type /* only EOM_TRANSFORM_FLIP_* are valid */);
-#if 0
-EomTransform* eom_transform_scale_new  (double sx, double sy);
-#endif
 EomTransform *eom_transform_new(EomTransformType trans);
 
 EomTransformType eom_transform_get_transform_type(EomTransform *trans);

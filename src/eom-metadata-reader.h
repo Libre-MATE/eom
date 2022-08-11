@@ -92,11 +92,6 @@ G_GNUC_INTERNAL
 XmpPtr eom_metadata_reader_get_xmp_data(EomMetadataReader *emr);
 #endif
 
-#if 0
-gpointer             eom_metadata_reader_get_iptc_chunk	(EomMetadataReader *emr);
-IptcData*            eom_metadata_reader_get_iptc_data	(EomMetadataReader *emr);
-#endif
-
 #ifdef HAVE_LCMS
 G_GNUC_INTERNAL
 cmsHPROFILE eom_metadata_reader_get_icc_profile(EomMetadataReader *emr);
