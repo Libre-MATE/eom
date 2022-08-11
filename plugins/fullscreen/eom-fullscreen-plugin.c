@@ -103,14 +103,7 @@ static void eom_fullscreen_plugin_deactivate(
   EomFullscreenPlugin *plugin = EOM_FULLSCREEN_PLUGIN(activatable);
   GtkWidget *view = eom_window_get_view(plugin->window);
 
-#if GLIB_CHECK_VERSION(2, 62, 0)
   g_clear_signal_handler(&plugin->signal_id, view);
-#else
-  if (plugin->signal_id != 0) {
-    g_signal_handler_disconnect(view, plugin->signal_id);
-    plugin->signal_id = 0;
-  }
-#endif
 }
 
 static void eom_fullscreen_plugin_class_init(EomFullscreenPluginClass *klass) {

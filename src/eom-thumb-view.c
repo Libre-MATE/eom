@@ -141,24 +141,10 @@ static void eom_thumb_view_dispose(GObject *object) {
     priv->visible_range_changed_id = 0;
   }
 
-#if GLIB_CHECK_VERSION(2, 62, 0)
   if ((model = gtk_icon_view_get_model(GTK_ICON_VIEW(object))) != NULL) {
     g_clear_signal_handler(&priv->image_add_id, model);
     g_clear_signal_handler(&priv->image_removed_id, model);
   }
-#else
-  if ((model = gtk_icon_view_get_model(GTK_ICON_VIEW(object))) != NULL) {
-    if (priv->image_add_id != 0) {
-      g_signal_handler_disconnect(model, priv->image_add_id);
-      priv->image_add_id = 0;
-    }
-
-    if (priv->image_removed_id != 0) {
-      g_signal_handler_disconnect(model, priv->image_removed_id);
-      priv->image_removed_id = 0;
-    }
-  }
-#endif
 
   G_OBJECT_CLASS(eom_thumb_view_parent_class)->dispose(object);
 }
