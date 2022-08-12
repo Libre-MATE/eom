@@ -2340,7 +2340,8 @@ static void eom_window_cmd_about(GtkAction *action, gpointer user_data) {
       _("About Eye of MATE"), "version", VERSION, "copyright",
       _("Copyright \xc2\xa9 2000-2010 Free Software Foundation, Inc.\n"
         "Copyright \xc2\xa9 2011 Perberos\n"
-        "Copyright \xc2\xa9 2012-2021 MATE developers"),
+        "Copyright \xc2\xa9 2012-2021 MATE developers\n"
+        "Copyright \xc2\xa9 2022 Libre MATE"),
       "comments",
       _("Eye of MATE is a simple graphics viewer for the MATE Desktop "
         "Environment."),
