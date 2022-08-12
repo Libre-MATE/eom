@@ -1517,7 +1517,7 @@ static gboolean style_set_cb(GtkWidget *widget, GtkStyle *previous_style,
 GtkWidget *_egg_editable_toolbar_new_separator_image(void) {
   GtkWidget *image = gtk_image_new();
   update_separator_image(GTK_IMAGE(image));
-  g_signal_connect(G_OBJECT(image), "style_set", G_CALLBACK(style_set_cb),
+  g_signal_connect(image, "style_set", G_CALLBACK(style_set_cb),
                    GTK_IMAGE(image));
 
   return image;
