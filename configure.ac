@@ -1,4 +1,4 @@
-AC_PREREQ(2.59)
+AC_PREREQ(2.60)
 AC_CONFIG_MACRO_DIR([m4])
 
 m4_define(eom_major_version, 1)
@@ -31,12 +31,10 @@ MATE_DEBUG_CHECK
 MATE_COMPILE_WARNINGS
 MATE_MAINTAINER_MODE_DEFINES
 
-# Disable building static archives by default
-AC_DISABLE_STATIC
-AC_PROG_LIBTOOL
-
 AC_PROG_CC
 AM_PROG_CC_C_O
+LT_INIT([disable-static])
+
 AC_PATH_PROG([GLIB_COMPILE_RESOURCES], [glib-compile-resources])
 AC_PATH_PROG([GLIB_GENMARSHAL], [glib-genmarshal])
 AC_PATH_PROG([GLIB_MKENUMS],[glib-mkenums])
