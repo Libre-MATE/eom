@@ -347,7 +347,6 @@ static void eom_window_can_save_changed_cb(GSettings *settings, gchar *key,
 
   priv->save_disabled = save_disabled;
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action_save = gtk_action_group_get_action(priv->actions_image, "ImageSave");
   action_save_as =
       gtk_action_group_get_action(priv->actions_image, "ImageSaveAs");
@@ -364,7 +363,6 @@ static void eom_window_can_save_changed_cb(GSettings *settings, gchar *key,
       gtk_action_set_sensitive(action_save_as, TRUE);
     }
   }
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 }
 
 #if defined(HAVE_LCMS) && defined(GDK_WINDOWING_X11)
@@ -546,7 +544,6 @@ static void update_action_groups_state(EomWindow *window) {
 
   priv = window->priv;
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action_collection =
       gtk_action_group_get_action(priv->actions_window, "ViewImageCollection");
 
@@ -560,7 +557,6 @@ static void update_action_groups_state(EomWindow *window) {
       gtk_action_group_get_action(priv->actions_collection, "ViewSlideshow");
 
   action_print = gtk_action_group_get_action(priv->actions_image, "ImagePrint");
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   g_assert(action_collection != NULL);
   g_assert(action_sidebar != NULL);
@@ -575,14 +571,12 @@ static void update_action_groups_state(EomWindow *window) {
   if (n_images == 0) {
     gtk_widget_hide(priv->layout);
 
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     gtk_action_group_set_sensitive(priv->actions_window, TRUE);
     gtk_action_group_set_sensitive(priv->actions_image, FALSE);
     gtk_action_group_set_sensitive(priv->actions_collection, FALSE);
 
     gtk_action_set_sensitive(action_fscreen, FALSE);
     gtk_action_set_sensitive(action_sshow, FALSE);
-    G_GNUC_END_IGNORE_DEPRECATIONS;
 
     /* If there are no images on model, initialization
        stops here. */
@@ -609,7 +603,6 @@ static void update_action_groups_state(EomWindow *window) {
 
     if (show_image_collection) gtk_widget_show(priv->nav);
 
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action_collection),
                                  show_image_collection);
 
@@ -626,7 +619,6 @@ static void update_action_groups_state(EomWindow *window) {
       gtk_action_group_set_sensitive(priv->actions_collection, TRUE);
       gtk_action_set_sensitive(action_sshow, TRUE);
     }
-    G_GNUC_END_IGNORE_DEPRECATIONS;
 
     if (show_image_collection)
       gtk_widget_grab_focus(priv->thumbview);
@@ -638,13 +630,11 @@ static void update_action_groups_state(EomWindow *window) {
                                           EOM_CONF_LOCKDOWN_CAN_PRINT);
 
   if (print_disabled) {
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     gtk_action_set_sensitive(action_print, FALSE);
   }
 
   if (eom_sidebar_is_empty(EOM_SIDEBAR(priv->sidebar))) {
     gtk_action_set_sensitive(action_sidebar, FALSE);
-    G_GNUC_END_IGNORE_DEPRECATIONS;
     gtk_widget_hide(priv->sidebar);
   }
 }
@@ -658,7 +648,6 @@ static void update_selection_ui_visibility(EomWindow *window) {
 
   n_selected = eom_thumb_view_get_n_selected(EOM_THUMB_VIEW(priv->thumbview));
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   wallpaper_action =
       gtk_action_group_get_action(priv->actions_image, "ImageSetAsWallpaper");
 
@@ -667,7 +656,6 @@ static void update_selection_ui_visibility(EomWindow *window) {
   } else {
     gtk_action_set_sensitive(wallpaper_action, FALSE);
   }
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 }
 
 static gboolean add_file_to_recent_files(GFile *file) {
@@ -913,9 +901,7 @@ static void eom_window_update_openwith_menu(EomWindow *window,
 
   if (!apps) return;
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   priv->actions_open_with = gtk_action_group_new("OpenWithActions");
-  G_GNUC_END_IGNORE_DEPRECATIONS;
   gtk_ui_manager_insert_action_group(priv->ui_mgr, priv->actions_open_with, -1);
 
   priv->open_with_menu_id = gtk_ui_manager_new_merge_id(priv->ui_mgr);
@@ -941,16 +927,12 @@ static void eom_window_update_openwith_menu(EomWindow *window,
     tip = g_strdup_printf(_("Use \"%s\" to open the selected image"),
                           g_app_info_get_name(app));
 
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     action = gtk_action_new(name, label, tip, NULL);
-    G_GNUC_END_IGNORE_DEPRECATIONS;
 
     app_icon = g_app_info_get_icon(app);
     if (G_LIKELY(app_icon != NULL)) {
       g_object_ref(app_icon);
-      G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
       gtk_action_set_gicon(action, app_icon);
-      G_GNUC_END_IGNORE_DEPRECATIONS;
       g_object_unref(app_icon);
     }
 
@@ -963,9 +945,7 @@ static void eom_window_update_openwith_menu(EomWindow *window,
     g_signal_connect(action, "activate",
                      G_CALLBACK(open_with_launch_application_cb), image);
 
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     gtk_action_group_add_action(priv->actions_open_with, action);
-    G_GNUC_END_IGNORE_DEPRECATIONS;
     g_object_unref(action);
 
     gtk_ui_manager_add_ui(
@@ -1017,13 +997,11 @@ static void eom_window_update_openwith_menu(EomWindow *window,
 
   g_list_free(apps);
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action =
       gtk_action_group_get_action(window->priv->actions_image, "OpenEditor");
   if (action != NULL) {
     gtk_action_set_sensitive(action, edit_button_active);
   }
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 }
 
 static void eom_window_clear_load_job(EomWindow *window) {
@@ -1226,9 +1204,7 @@ static void eom_job_load_cb(EomJobLoad *job, gpointer data) {
     eom_image_apply_display_profile(job->image, priv->display_profile);
 #endif
 
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     gtk_action_group_set_sensitive(priv->actions_image, TRUE);
-    G_GNUC_END_IGNORE_DEPRECATIONS;
 
     eom_window_display_image(window, job->image);
   } else {
@@ -1261,9 +1237,7 @@ static void eom_job_load_cb(EomJobLoad *job, gpointer data) {
       g_signal_emit(window, signals[SIGNAL_PREPARED], 0);
     }
 
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     gtk_action_group_set_sensitive(priv->actions_image, FALSE);
-    G_GNUC_END_IGNORE_DEPRECATIONS;
   }
 
   eom_window_clear_load_job(window);
@@ -1275,7 +1249,6 @@ static void eom_job_load_cb(EomJobLoad *job, gpointer data) {
         job->image, eom_window_obtain_desired_size, window);
   }
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action_save = gtk_action_group_get_action(priv->actions_image, "ImageSave");
   action_undo = gtk_action_group_get_action(priv->actions_image, "EditUndo");
 
@@ -1284,7 +1257,6 @@ static void eom_job_load_cb(EomJobLoad *job, gpointer data) {
   gtk_action_set_sensitive(
       action_save, (!priv->save_disabled && eom_image_is_modified(job->image)));
   gtk_action_set_sensitive(action_undo, eom_image_is_modified(job->image));
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   g_object_unref(job->image);
 }
@@ -1314,7 +1286,6 @@ static void eom_job_transform_cb(EomJobTransform *job, gpointer data) {
 
   eom_window_clear_transform_job(window);
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action_undo =
       gtk_action_group_get_action(window->priv->actions_image, "EditUndo");
   action_save =
@@ -1327,7 +1298,6 @@ static void eom_job_transform_cb(EomJobTransform *job, gpointer data) {
   if (!window->priv->save_disabled) {
     gtk_action_set_sensitive(action_save, eom_image_is_modified(image));
   }
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 }
 
 static void apply_transformation(EomWindow *window, EomTransform *trans) {
@@ -1438,7 +1408,6 @@ static void view_zoom_changed_cb(GtkWidget *widget, double zoom,
 
   update_status_bar(window);
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action_zoom_in =
       gtk_action_group_get_action(window->priv->actions_image, "ViewZoomIn");
 
@@ -1451,7 +1420,6 @@ static void view_zoom_changed_cb(GtkWidget *widget, double zoom,
   gtk_action_set_sensitive(
       action_zoom_out,
       !eom_scroll_view_get_zoom_is_min(EOM_SCROLL_VIEW(window->priv->view)));
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 }
 
 static void eom_window_open_recent_cb(GtkAction *action, EomWindow *window) {
@@ -1488,7 +1456,6 @@ static void file_open_dialog_response_cb(GtkWidget *chooser, gint response_id,
 static void eom_window_update_fullscreen_action(EomWindow *window) {
   GtkAction *action;
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action = gtk_action_group_get_action(window->priv->actions_image,
                                        "ViewFullscreen");
 
@@ -1497,7 +1464,6 @@ static void eom_window_update_fullscreen_action(EomWindow *window) {
   gtk_toggle_action_set_active(
       GTK_TOGGLE_ACTION(action),
       window->priv->mode == EOM_WINDOW_MODE_FULLSCREEN);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   g_signal_handlers_unblock_by_func(action, eom_window_cmd_fullscreen, window);
 }
@@ -1505,7 +1471,6 @@ static void eom_window_update_fullscreen_action(EomWindow *window) {
 static void eom_window_update_slideshow_action(EomWindow *window) {
   GtkAction *action;
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action = gtk_action_group_get_action(window->priv->actions_collection,
                                        "ViewSlideshow");
 
@@ -1513,7 +1478,6 @@ static void eom_window_update_slideshow_action(EomWindow *window) {
 
   gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),
                                window->priv->mode == EOM_WINDOW_MODE_SLIDESHOW);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   g_signal_handlers_unblock_by_func(action, eom_window_cmd_slideshow, window);
 }
@@ -1521,7 +1485,6 @@ static void eom_window_update_slideshow_action(EomWindow *window) {
 static void eom_window_update_pause_slideshow_action(EomWindow *window) {
   GtkAction *action;
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action = gtk_action_group_get_action(window->priv->actions_image,
                                        "PauseSlideshow");
 
@@ -1530,7 +1493,6 @@ static void eom_window_update_pause_slideshow_action(EomWindow *window) {
 
   gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action),
                                window->priv->mode != EOM_WINDOW_MODE_SLIDESHOW);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   g_signal_handlers_unblock_by_func(action, eom_window_cmd_pause_slideshow,
                                     window);
@@ -1711,7 +1673,6 @@ static void exit_fullscreen_button_clicked_cb(GtkWidget *button,
 
   eom_debug(DEBUG_WINDOW);
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   if (window->priv->mode == EOM_WINDOW_MODE_SLIDESHOW) {
     action = gtk_action_group_get_action(window->priv->actions_collection,
                                          "ViewSlideshow");
@@ -1722,7 +1683,6 @@ static void exit_fullscreen_button_clicked_cb(GtkWidget *button,
   g_return_if_fail(action != NULL);
 
   gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), FALSE);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 }
 
 static GtkWidget *eom_window_get_exit_fullscreen_button(EomWindow *window) {
@@ -1803,9 +1763,7 @@ static void update_ui_visibility(EomWindow *window) {
   action =
       gtk_ui_manager_get_action(priv->ui_mgr, "/MainMenu/View/ToolbarToggle");
   g_assert(action != NULL);
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), visible);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
   g_object_set(G_OBJECT(priv->toolbar), "visible", visible, NULL);
 
   visible = g_settings_get_boolean(priv->ui_settings, EOM_CONF_UI_STATUSBAR);
@@ -1814,9 +1772,7 @@ static void update_ui_visibility(EomWindow *window) {
   action =
       gtk_ui_manager_get_action(priv->ui_mgr, "/MainMenu/View/StatusbarToggle");
   g_assert(action != NULL);
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), visible);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
   g_object_set(G_OBJECT(priv->statusbar), "visible", visible, NULL);
 
   if (priv->status != EOM_WINDOW_STATUS_INIT) {
@@ -1826,9 +1782,7 @@ static void update_ui_visibility(EomWindow *window) {
     action = gtk_ui_manager_get_action(priv->ui_mgr,
                                        "/MainMenu/View/ImageCollectionToggle");
     g_assert(action != NULL);
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), visible);
-    G_GNUC_END_IGNORE_DEPRECATIONS;
     if (visible) {
       gtk_widget_show(priv->nav);
     } else {
@@ -1841,9 +1795,7 @@ static void update_ui_visibility(EomWindow *window) {
   action =
       gtk_ui_manager_get_action(priv->ui_mgr, "/MainMenu/View/SidebarToggle");
   g_assert(action != NULL);
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), visible);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
   if (visible) {
     gtk_widget_show(priv->sidebar);
   } else {
@@ -2417,10 +2369,8 @@ static void eom_window_cmd_show_hide_bar(GtkAction *action,
       priv->mode != EOM_WINDOW_MODE_FULLSCREEN)
     return;
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   visible = gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action));
   action_name = gtk_action_get_name(action);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   if (g_ascii_strcasecmp(action_name, "ViewToolbar") == 0) {
     g_object_set(G_OBJECT(priv->toolbar), "visible", visible, NULL);
@@ -2580,11 +2530,9 @@ static void eom_job_save_cb(EomJobSave *job, gpointer user_data) {
   window->priv->save_job = NULL;
 
   update_status_bar(window);
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action_save =
       gtk_action_group_get_action(window->priv->actions_image, "ImageSave");
   gtk_action_set_sensitive(action_save, FALSE);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 }
 
 static void eom_job_copy_cb(EomJobCopy *job, gpointer user_data) {
@@ -2618,11 +2566,9 @@ static void eom_job_copy_cb(EomJobCopy *job, gpointer user_data) {
 
   gtk_statusbar_pop(GTK_STATUSBAR(window->priv->statusbar),
                     window->priv->copy_file_cid);
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action = gtk_action_group_get_action(window->priv->actions_image,
                                        "ImageSetAsWallpaper");
   gtk_action_set_sensitive(action, TRUE);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   window->priv->copy_job = NULL;
 
@@ -2826,13 +2772,11 @@ GtkWidget *eom_window_get_properties_dialog(EomWindow *window) {
   if (priv->properties_dlg == NULL) {
     GtkAction *next_image_action, *previous_image_action;
 
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     next_image_action =
         gtk_action_group_get_action(priv->actions_collection, "GoNext");
 
     previous_image_action =
         gtk_action_group_get_action(priv->actions_collection, "GoPrevious");
-    G_GNUC_END_IGNORE_DEPRECATIONS;
     priv->properties_dlg = eom_properties_dialog_new(
         GTK_WINDOW(window), EOM_THUMB_VIEW(priv->thumbview), next_image_action,
         previous_image_action);
@@ -2917,11 +2861,9 @@ static void eom_window_cmd_wallpaper(GtkAction *action, gpointer user_data) {
     GList *files = NULL;
     GtkAction *action_set_as_wp;
 
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     action_set_as_wp = gtk_action_group_get_action(window->priv->actions_image,
                                                    "ImageSetAsWallpaper");
     gtk_action_set_sensitive(action_set_as_wp, FALSE);
-    G_GNUC_END_IGNORE_DEPRECATIONS;
 
     priv->copy_file_cid = gtk_statusbar_get_context_id(
         GTK_STATUSBAR(priv->statusbar), "copy_file_cid");
@@ -3161,9 +3103,7 @@ static void eom_window_cmd_move_to_trash(GtkAction *action,
 
   can_trash = eom_window_all_images_trasheable(images);
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action_name = gtk_action_get_name(action);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   if (g_ascii_strcasecmp(action_name, "Delete") == 0 || can_trash == FALSE) {
     response = show_move_to_trash_confirm_dialog(window, images, can_trash);
@@ -3237,9 +3177,7 @@ static void eom_window_cmd_fullscreen(GtkAction *action, gpointer user_data) {
 
   window = EOM_WINDOW(user_data);
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   fullscreen = gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action));
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   if (fullscreen) {
     eom_window_run_fullscreen(window, FALSE);
@@ -3258,9 +3196,7 @@ static void eom_window_cmd_slideshow(GtkAction *action, gpointer user_data) {
 
   window = EOM_WINDOW(user_data);
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   slideshow = gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action));
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   if (slideshow) {
     eom_window_run_fullscreen(window, TRUE);
@@ -3549,9 +3485,7 @@ static void menu_item_select_cb(GtkMenuItem *proxy, EomWindow *window) {
   GtkAction *action;
   char *message;
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action = gtk_activatable_get_related_action(GTK_ACTIVATABLE(proxy));
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   g_return_if_fail(action != NULL);
 
@@ -3592,7 +3526,6 @@ static void set_action_properties(GtkActionGroup *window_group,
                                   GtkActionGroup *collection_group) {
   GtkAction *action;
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action = gtk_action_group_get_action(collection_group, "GoPrevious");
   g_object_set(action, "short_label", _("_Previous"), NULL);
   g_object_set(action, "is-important", TRUE, NULL);
@@ -3628,7 +3561,6 @@ static void set_action_properties(GtkActionGroup *window_group,
 
   action = gtk_action_group_get_action(image_group, "EditMoveToTrash");
   g_object_set(action, "short_label", C_("action (to trash)", "Trash"), NULL);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 }
 
 static gint sort_recents_mru(GtkRecentInfo *a, GtkRecentInfo *b) {
@@ -3669,7 +3601,6 @@ static void eom_window_update_recent_files_menu(EomWindow *window) {
   if (priv->recent_menu_id != 0)
     gtk_ui_manager_remove_ui(priv->ui_mgr, priv->recent_menu_id);
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   actions = gtk_action_group_list_actions(priv->actions_recent);
 
   for (li = actions; li != NULL; li = li->next) {
@@ -3678,7 +3609,6 @@ static void eom_window_update_recent_files_menu(EomWindow *window) {
 
     gtk_action_group_remove_action(priv->actions_recent, GTK_ACTION(li->data));
   }
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   g_list_free(actions);
 
@@ -3721,10 +3651,8 @@ static void eom_window_update_recent_files_menu(EomWindow *window) {
     if (tip == NULL)
       tip = g_uri_unescape_string(gtk_recent_info_get_uri(info), NULL);
 
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     action = gtk_action_new(action_name, label, tip, NULL);
     gtk_action_set_always_show_image(action, TRUE);
-    G_GNUC_END_IGNORE_DEPRECATIONS;
 
     g_object_set_data_full(G_OBJECT(action), "gtk-recent-info",
                            gtk_recent_info_ref(info),
@@ -3735,9 +3663,7 @@ static void eom_window_update_recent_files_menu(EomWindow *window) {
     g_signal_connect(action, "activate", G_CALLBACK(eom_window_open_recent_cb),
                      window);
 
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     gtk_action_group_add_action(priv->actions_recent, action);
-    G_GNUC_END_IGNORE_DEPRECATIONS;
 
     g_object_unref(action);
 
@@ -3804,7 +3730,6 @@ static void eom_window_sidebar_visibility_changed(GtkWidget *widget,
   GtkAction *action;
   gboolean visible;
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   visible = gtk_widget_get_visible(window->priv->sidebar);
 
   action =
@@ -3812,7 +3737,6 @@ static void eom_window_sidebar_visibility_changed(GtkWidget *widget,
 
   if (gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action)) != visible)
     gtk_toggle_action_set_active(GTK_TOGGLE_ACTION(action), visible);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   /* Focus the image */
   if (!visible && window->priv->image != NULL)
@@ -3826,14 +3750,12 @@ static void eom_window_sidebar_page_added(EomSidebar *sidebar,
     GtkAction *action;
     gboolean show;
 
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     action = gtk_action_group_get_action(window->priv->actions_window,
                                          "ViewSidebar");
 
     gtk_action_set_sensitive(action, TRUE);
 
     show = gtk_toggle_action_get_active(GTK_TOGGLE_ACTION(action));
-    G_GNUC_END_IGNORE_DEPRECATIONS;
 
     if (show) gtk_widget_show(GTK_WIDGET(sidebar));
   }
@@ -3846,12 +3768,10 @@ static void eom_window_sidebar_page_removed(EomSidebar *sidebar,
 
     gtk_widget_hide(GTK_WIDGET(sidebar));
 
-    G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
     action = gtk_action_group_get_action(window->priv->actions_window,
                                          "ViewSidebar");
 
     gtk_action_set_sensitive(action, FALSE);
-    G_GNUC_END_IGNORE_DEPRECATIONS;
   }
 }
 
@@ -3943,7 +3863,6 @@ static void eom_window_add_open_editor_action(EomWindow *window) {
 
   tooltip = g_strdup_printf(_("Edit the current image using %s"),
                             g_app_info_get_name(app_info));
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   action = gtk_action_new("OpenEditor", _("Edit Image"), tooltip, NULL);
   gtk_action_set_gicon(action, g_app_info_get_icon(app_info));
   gtk_action_set_is_important(action, TRUE);
@@ -3952,7 +3871,6 @@ static void eom_window_add_open_editor_action(EomWindow *window) {
                    window);
 
   gtk_action_group_add_action(window->priv->actions_image, action);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   g_object_unref(action);
   g_free(tooltip);
@@ -3979,7 +3897,6 @@ static void eom_window_construct_ui(EomWindow *window) {
 
   priv->ui_mgr = gtk_ui_manager_new();
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   priv->actions_window = gtk_action_group_new("MenuActionsWindow");
 
 #ifdef ENABLE_NLS
@@ -3993,11 +3910,9 @@ static void eom_window_construct_ui(EomWindow *window) {
   gtk_action_group_add_toggle_actions(
       priv->actions_window, toggle_entries_window,
       G_N_ELEMENTS(toggle_entries_window), window);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   gtk_ui_manager_insert_action_group(priv->ui_mgr, priv->actions_window, 0);
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   priv->actions_image = gtk_action_group_new("MenuActionsImage");
 #ifdef ENABLE_NLS
   gtk_action_group_set_translation_domain(priv->actions_image, GETTEXT_PACKAGE);
@@ -4011,11 +3926,9 @@ static void eom_window_construct_ui(EomWindow *window) {
   gtk_action_group_add_toggle_actions(priv->actions_image, toggle_entries_image,
                                       G_N_ELEMENTS(toggle_entries_image),
                                       window);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   gtk_ui_manager_insert_action_group(priv->ui_mgr, priv->actions_image, 0);
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   priv->actions_collection = gtk_action_group_new("MenuActionsCollection");
 #ifdef ENABLE_NLS
   gtk_action_group_set_translation_domain(priv->actions_collection,
@@ -4029,7 +3942,6 @@ static void eom_window_construct_ui(EomWindow *window) {
   gtk_action_group_add_toggle_actions(
       priv->actions_collection, toggle_entries_collection,
       G_N_ELEMENTS(toggle_entries_collection), window);
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   set_action_properties(priv->actions_window, priv->actions_image,
                         priv->actions_collection);
@@ -4091,13 +4003,11 @@ static void eom_window_construct_ui(EomWindow *window) {
   gtk_window_add_accel_group(GTK_WINDOW(window),
                              gtk_ui_manager_get_accel_group(priv->ui_mgr));
 
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS;
   priv->actions_recent = gtk_action_group_new("RecentFilesActions");
 #ifdef ENABLE_NLS
   gtk_action_group_set_translation_domain(priv->actions_recent,
                                           GETTEXT_PACKAGE);
 #endif /* ENABLE_NLS */
-  G_GNUC_END_IGNORE_DEPRECATIONS;
 
   g_signal_connect(gtk_recent_manager_get_default(), "changed",
                    G_CALLBACK(eom_window_recent_manager_changed_cb), window);
