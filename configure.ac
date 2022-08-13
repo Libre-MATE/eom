@@ -1,12 +1,12 @@
-AC_PREREQ(2.60)
-AC_CONFIG_MACRO_DIR([m4])
-
 m4_define(eom_major_version, 1)
 m4_define(eom_minor_version, 26)
 m4_define(eom_micro_version, 0)
 m4_define(eom_version, eom_major_version.eom_minor_version.eom_micro_version)
 
 AC_INIT([eom], eom_version, https://github.com/Libre-MATE/eom/issues, [eom], [https://github.com/Libre-MATE/eom])
+AC_PREREQ(2.60)
+
+AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.9 foreign no-dist-gzip dist-xz check-news])
 
 # Support silencing the build output if supported (automake-1.11+)
