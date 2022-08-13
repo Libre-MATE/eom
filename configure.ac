@@ -5,6 +5,7 @@ m4_define(eom_version, eom_major_version.eom_minor_version.eom_micro_version)
 
 AC_INIT([eom], eom_version, https://github.com/Libre-MATE/eom/issues, [eom], [https://github.com/Libre-MATE/eom])
 AC_PREREQ(2.60)
+AC_COPYRIGHT([Copyright (C) 2022 Libre MATE])
 
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.9 foreign no-dist-gzip dist-xz check-news])
