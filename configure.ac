@@ -23,12 +23,10 @@ m4_define(eom_version, eom_major_version.eom_minor_version.eom_micro_version)
 AC_INIT([eom], eom_version, https://github.com/Libre-MATE/eom/issues, [eom], [https://github.com/Libre-MATE/eom])
 AC_PREREQ(2.60)
 AC_COPYRIGHT([Copyright (C) 2022 Libre MATE])
-
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([1.9 foreign no-dist-gzip dist-xz check-news])
-
-# Support silencing the build output if supported (automake-1.11+)
-m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
+AM_INIT_AUTOMAKE([1.11 foreign no-dist-gzip dist-xz silent-rules check-news])
+AC_CONFIG_HEADERS([config.h])
+AM_MAINTAINER_MODE
 
 AC_DEFINE(EOM_MAJOR_VERSION, eom_major_version, [EOM major version])
 AC_SUBST(EOM_MAJOR_VERSION,  eom_major_version)
@@ -39,10 +37,6 @@ AC_SUBST(EOM_MICRO_VERSION,  eom_micro_version)
 
 EOM_API_VERSION=2.20
 AC_SUBST(EOM_API_VERSION)
-
-AC_CONFIG_HEADERS([config.h])
-
-AM_MAINTAINER_MODE
 
 MATE_COMMON_INIT
 MATE_DEBUG_CHECK
