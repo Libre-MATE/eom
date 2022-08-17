@@ -33,67 +33,67 @@
 G_DEFINE_INTERFACE(EomMetadataReader, eom_metadata_reader, G_TYPE_INVALID)
 
 EomMetadataReader *eom_metadata_reader_new(EomMetadataFileType type) {
-  EomMetadataReader *emr;
+  EomMetadataReader *self;
 
   switch (type) {
     case EOM_METADATA_JPEG:
-      emr =
+      self =
           EOM_METADATA_READER(g_object_new(EOM_TYPE_METADATA_READER_JPG, NULL));
       break;
     case EOM_METADATA_PNG:
-      emr =
+      self =
           EOM_METADATA_READER(g_object_new(EOM_TYPE_METADATA_READER_PNG, NULL));
       break;
     default:
-      emr = NULL;
+      self = NULL;
       break;
   }
 
-  return emr;
+  return self;
 }
 
-gboolean eom_metadata_reader_finished(EomMetadataReader *emr) {
-  g_return_val_if_fail(EOM_IS_METADATA_READER(emr), TRUE);
+gboolean eom_metadata_reader_finished(EomMetadataReader *self) {
+  g_return_val_if_fail(EOM_IS_METADATA_READER(self), TRUE);
 
-  return EOM_METADATA_READER_GET_INTERFACE(emr)->finished(emr);
+  return EOM_METADATA_READER_GET_IFACE(self)->finished(self);
 }
 
-void eom_metadata_reader_consume(EomMetadataReader *emr, const guchar *buf,
+void eom_metadata_reader_consume(EomMetadataReader *self, const guchar *buf,
                                  guint len) {
-  EOM_METADATA_READER_GET_INTERFACE(emr)->consume(emr, buf, len);
+  EOM_METADATA_READER_GET_IFACE(self)->consume(self, buf, len);
 }
 
 /* Returns the raw exif data. NOTE: The caller of this function becomes
  * the new owner of this piece of memory and is responsible for freeing it!
  */
-void eom_metadata_reader_get_exif_chunk(EomMetadataReader *emr, guchar **data,
+void eom_metadata_reader_get_exif_chunk(EomMetadataReader *self, guchar **data,
                                         guint *len) {
   g_return_if_fail(data != NULL && len != NULL);
 
-  EOM_METADATA_READER_GET_INTERFACE(emr)->get_raw_exif(emr, data, len);
+  EOM_METADATA_READER_GET_IFACE(self)->get_raw_exif(self, data, len);
 }
 
 #ifdef HAVE_EXIF
-ExifData *eom_metadata_reader_get_exif_data(EomMetadataReader *emr) {
-  return EOM_METADATA_READER_GET_INTERFACE(emr)->get_exif_data(emr);
+ExifData *eom_metadata_reader_get_exif_data(EomMetadataReader *self) {
+  return EOM_METADATA_READER_GET_IFACE(self)->get_exif_data(self);
 }
 #endif
 
 #ifdef HAVE_EXEMPI
-XmpPtr eom_metadata_reader_get_xmp_data(EomMetadataReader *emr) {
-  return EOM_METADATA_READER_GET_INTERFACE(emr)->get_xmp_ptr(emr);
+XmpPtr eom_metadata_reader_get_xmp_data(EomMetadataReader *self) {
+  return EOM_METADATA_READER_GET_IFACE(self)->get_xmp_ptr(self);
 }
 #endif
 
 #if defined(HAVE_LCMS) && defined(GDK_WINDOWING_X11)
-cmsHPROFILE eom_metadata_reader_get_icc_profile(EomMetadataReader *emr) {
-  return EOM_METADATA_READER_GET_INTERFACE(emr)->get_icc_profile(emr);
+cmsHPROFILE eom_metadata_reader_get_icc_profile(EomMetadataReader *self) {
+  return EOM_METADATA_READER_GET_IFACE(self)->get_icc_profile(self);
 }
 #endif
 
 /* Default vfunc that simply clears the output if not overriden by the
    implementing class. This mimics the old behavour of get_exif_chunk(). */
-static void _eom_metadata_reader_default_get_raw_exif(EomMetadataReader *emr,
+static void _eom_metadata_reader_default_get_raw_exif(EomMetadataReader *self,
                                                       guchar **data,
                                                       guint *length) {
   g_return_if_fail(data != NULL && length != NULL);
@@ -103,7 +103,7 @@ static void _eom_metadata_reader_default_get_raw_exif(EomMetadataReader *emr,
 
 /* Default vfunc that simply returns NULL if not overriden by the implementing
    class. Mimics the old fallback behaviour of the getter functions. */
-static gpointer _eom_metadata_reader_default_get_null(EomMetadataReader *emr) {
+static gpointer _eom_metadata_reader_default_get_null(EomMetadataReader *self) {
   return NULL;
 }
 static void eom_metadata_reader_default_init(

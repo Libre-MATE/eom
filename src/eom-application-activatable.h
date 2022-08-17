@@ -34,21 +34,8 @@ G_BEGIN_DECLS
 
 #define EOM_TYPE_APPLICATION_ACTIVATABLE \
   (eom_application_activatable_get_type())
-#define EOM_APPLICATION_ACTIVATABLE(obj)                               \
-  (G_TYPE_CHECK_INSTANCE_CAST((obj), EOM_TYPE_APPLICATION_ACTIVATABLE, \
-                              EomApplicationActivatable))
-#define EOM_APPLICATION_ACTIVATABLE_IFACE(obj)                      \
-  (G_TYPE_CHECK_CLASS_CAST((obj), EOM_TYPE_APPLICATION_ACTIVATABLE, \
-                           EomApplicationActivatableInterface))
-#define EOM_IS_APPLICATION_ACTIVATABLE(obj) \
-  (G_TYPE_CHECK_INSTANCE_TYPE((obj), EOM_TYPE_APPLICATION_ACTIVATABLE))
-#define EOM_APPLICATION_ACTIVATABLE_GET_IFACE(obj)                        \
-  (G_TYPE_INSTANCE_GET_INTERFACE((obj), EOM_TYPE_APPLICATION_ACTIVATABLE, \
-                                 EomApplicationActivatableInterface))
-
-typedef struct _EomApplicationActivatable EomApplicationActivatable;
-typedef struct _EomApplicationActivatableInterface
-    EomApplicationActivatableInterface;
+G_DECLARE_INTERFACE (EomApplicationActivatable, eom_application_activatable,
+                     EOM, APPLICATION_ACTIVATABLE, GObject);
 
 struct _EomApplicationActivatableInterface {
   GTypeInterface g_iface;
@@ -58,8 +45,6 @@ struct _EomApplicationActivatableInterface {
   void (*activate)(EomApplicationActivatable *activatable);
   void (*deactivate)(EomApplicationActivatable *activatable);
 };
-
-GType eom_application_activatable_get_type(void) G_GNUC_CONST;
 
 void eom_application_activatable_activate(
     EomApplicationActivatable *activatable);

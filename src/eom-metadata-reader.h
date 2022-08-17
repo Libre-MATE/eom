@@ -36,16 +36,7 @@
 G_BEGIN_DECLS
 
 #define EOM_TYPE_METADATA_READER (eom_metadata_reader_get_type())
-#define EOM_METADATA_READER(o) \
-  (G_TYPE_CHECK_INSTANCE_CAST((o), EOM_TYPE_METADATA_READER, EomMetadataReader))
-#define EOM_IS_METADATA_READER(o) \
-  (G_TYPE_CHECK_INSTANCE_TYPE((o), EOM_TYPE_METADATA_READER))
-#define EOM_METADATA_READER_GET_INTERFACE(o)                    \
-  (G_TYPE_INSTANCE_GET_INTERFACE((o), EOM_TYPE_METADATA_READER, \
-                                 EomMetadataReaderInterface))
-
-typedef struct _EomMetadataReader EomMetadataReader;
-typedef struct _EomMetadataReaderInterface EomMetadataReaderInterface;
+G_DECLARE_INTERFACE (EomMetadataReader, eom_metadata_reader, EOM, METADATA_READER, GObject);
 
 struct _EomMetadataReaderInterface {
   GTypeInterface parent;
@@ -66,35 +57,32 @@ struct _EomMetadataReaderInterface {
 typedef enum { EOM_METADATA_JPEG, EOM_METADATA_PNG } EomMetadataFileType;
 
 G_GNUC_INTERNAL
-GType eom_metadata_reader_get_type(void) G_GNUC_CONST;
-
-G_GNUC_INTERNAL
 EomMetadataReader *eom_metadata_reader_new(EomMetadataFileType type);
 
 G_GNUC_INTERNAL
-void eom_metadata_reader_consume(EomMetadataReader *emr, const guchar *buf,
+void eom_metadata_reader_consume(EomMetadataReader *self, const guchar *buf,
                                  guint len);
 
 G_GNUC_INTERNAL
-gboolean eom_metadata_reader_finished(EomMetadataReader *emr);
+gboolean eom_metadata_reader_finished(EomMetadataReader *self);
 
 G_GNUC_INTERNAL
-void eom_metadata_reader_get_exif_chunk(EomMetadataReader *emr, guchar **data,
+void eom_metadata_reader_get_exif_chunk(EomMetadataReader *self, guchar **data,
                                         guint *len);
 
 #ifdef HAVE_EXIF
 G_GNUC_INTERNAL
-ExifData *eom_metadata_reader_get_exif_data(EomMetadataReader *emr);
+ExifData *eom_metadata_reader_get_exif_data(EomMetadataReader *self);
 #endif
 
 #ifdef HAVE_EXEMPI
 G_GNUC_INTERNAL
-XmpPtr eom_metadata_reader_get_xmp_data(EomMetadataReader *emr);
+XmpPtr eom_metadata_reader_get_xmp_data(EomMetadataReader *self);
 #endif
 
 #ifdef HAVE_LCMS
 G_GNUC_INTERNAL
-cmsHPROFILE eom_metadata_reader_get_icc_profile(EomMetadataReader *emr);
+cmsHPROFILE eom_metadata_reader_get_icc_profile(EomMetadataReader *self);
 #endif
 
 G_END_DECLS
